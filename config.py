@@ -31,141 +31,95 @@ class Paths:
 
     # Raíz de datos 
     DATA_DIR         = ROOT_DIR / "data"
-
     # Datos crudos
-
     RAW_DIR          = DATA_DIR / "raw"
     RAW_GOOGLE       = RAW_DIR  / "google"
     RAW_TRIP         = RAW_DIR  / "trip"
     RAW_INSTA        = RAW_DIR  / "insta"
     RAW_COMPLETE_CSV = RAW_DIR  / "complete.csv"
-
-    
     # Datos por idioma (output del preprocesamiento)
-    
     DATA_SPANISH_DIR  = DATA_DIR / "data_spanish"
     DATA_ENGLISH_DIR  = DATA_DIR / "data_english"
     DATA_MIXED_DIR    = DATA_DIR / "data_mixed"
-
     SPANISH_CLEAN_CSV    = DATA_SPANISH_DIR / "clean.csv"
     SPANISH_ANALYSIS_CSV = DATA_SPANISH_DIR / "analysis.csv"
     SPANISH_ANALYSIS_JSON= DATA_SPANISH_DIR / "analysis.json"
-
     ENGLISH_CLEAN_CSV    = DATA_ENGLISH_DIR / "clean.csv"
     ENGLISH_ANALYSIS_CSV = DATA_ENGLISH_DIR / "analysis.csv"
     ENGLISH_ANALYSIS_JSON= DATA_ENGLISH_DIR / "analysis.json"
-
     MIXED_CLEAN_CSV      = DATA_MIXED_DIR   / "clean.csv"
     MIXED_ANALYSIS_CSV   = DATA_MIXED_DIR   / "analysis.csv"
     MIXED_ANALYSIS_JSON  = DATA_MIXED_DIR   / "analysis.json"
-
-    
-    
     # Traducciones y normalización de idioma
-    
     TRANSLATIONS_DIR      = DATA_DIR / "translations"
     JOINED_CSV            = TRANSLATIONS_DIR / "joined.csv"
     NORMALIZED_SPANISH_CSV= TRANSLATIONS_DIR / "normalized_spanish.csv"
-
-    
     # Datos unificados (merge de los tres idiomas)
-
     UNIFIED_DIR           = DATA_DIR / "unified"
     UNIFIED_ANALYSIS_CSV  = UNIFIED_DIR / "analysis_unified.csv"
     UNIFIED_ANALYSIS_JSON = UNIFIED_DIR / "analysis_json_unified.json"
-
-    
     # Vocabulario y n-gramas
-    
     PROCESSED_DIR         = DATA_DIR / "processed"
     RANKINGS_UNIGRAMS_CSV = PROCESSED_DIR / "rankings_unigrams.csv"
     RANKINGS_BIGRAMS_CSV  = PROCESSED_DIR / "rankings_bigrams.csv"
     RANKINGS_TRIGRAMS_CSV = PROCESSED_DIR / "rankings_trigrams.csv"
-
-    
     # Features NLP
-    
     FEATURES_DIR          = DATA_DIR / "features"
     FEATURES_NLP_CSV      = FEATURES_DIR / "features_nlp.csv"
     DOCS_WITH_TOPICS_NPY  = FEATURES_DIR / "docs_with_topics.npy"
     NER_GROUPS_JSON       = FEATURES_DIR / "ner_groups.json"
     ENTITIES_TOP_WORDS_JSON = FEATURES_DIR / "entities_top_words.json"
-
-    
     # Modelos entrenados
-    
     MODELS_DIR            = DATA_DIR / "models"
     BERTOPIC_MODEL_DIR    = MODELS_DIR / "bertopic_model"
     TFIDF_PKL             = MODELS_DIR / "tfidf.pkl"
     YAKE_PKL              = MODELS_DIR / "yake_vectorizer.pkl"
-
-    
     # Resultados de BERTopic
-    
     RESULTS_DIR           = DATA_DIR / "results"
     DOCS_WITH_TOPICS_CSV  = RESULTS_DIR / "docs_with_topics.csv"
     TOPICS_CSV            = RESULTS_DIR / "topics.csv"
     MICROTOPICS_CSV       = RESULTS_DIR / "microtopics.csv"
-
-    
     # Clustering
-    
     CLUSTERING_DIR               = DATA_DIR / "clustering"
     CLUSTERING_COMPARACION_CSV   = CLUSTERING_DIR / "comparacion_fuentes.csv"
-
     CLUSTERING_EMBEDDINGS_DIR    = CLUSTERING_DIR / "embeddings"
     CLUSTERING_FEATURES_DIR      = CLUSTERING_DIR / "features"
     CLUSTERING_TFIDF_DIR         = CLUSTERING_DIR / "tfidf"
     CLUSTERING_YAKE_DIR          = CLUSTERING_DIR / "yake"
-
     # Archivos estándar dentro de cada subcarpeta de clustering
     # Se usan como: Paths.CLUSTERING_EMBEDDINGS_DIR / Paths.CLUSTERING_RANKING_FILE
     CLUSTERING_RANKING_FILE      = Path("ranking_completo.csv")
     CLUSTERING_MEJORES_FILE      = Path("mejores_modelos.csv")
     CLUSTERING_ETIQUETAS_FILE    = Path("etiquetas_mejores.json")
     CLUSTERING_PROYECCION_FILE   = Path("proyeccion_2d.npy")
-
-    
     # Topic enrichment
-    
     ENRICHMENT_DIR               = DATA_DIR / "topic_enrichment"
     ENRICHMENT_RESUMEN_CSV       = ENRICHMENT_DIR / "resumen_enrichment.csv"
-
     # Ruta activa usada por las visualizaciones (KMeans k=8 sobre embeddings)
     ENRICHMENT_ACTIVE_DIR        = ENRICHMENT_DIR / "embeddings" / "kmeans_k8"
     ENRICHMENT_KEYWORDS_CSV      = ENRICHMENT_ACTIVE_DIR / "keywords_por_cluster.csv"
-
-    
     # Análisis
-    
     ANALYSIS_DIR                 = DATA_DIR / "analysis"
     ANALYSIS_RESUMEN_CSV         = ANALYSIS_DIR / "resumen_analysis.csv"
-
     SENTIMENT_DIR                = ANALYSIS_DIR / "sentiment"
     CORPUS_CON_SENTIMIENTO_CSV   = SENTIMENT_DIR / "corpus_con_sentimiento.csv"
     SENTIMIENTO_POR_TOPICO_CSV   = SENTIMENT_DIR / "sentimiento_por_topico.csv"
     SENTIMIENTO_POR_DESTINO_CSV  = SENTIMENT_DIR / "sentimiento_por_destino.csv"
     SENTIMIENTO_POR_TOPICO_DESTINO_CSV = SENTIMENT_DIR / "sentimiento_por_topico_destino.csv"
-
     ENTITIES_DIR                 = ANALYSIS_DIR / "entities"
     ENTIDADES_CON_SENTIMIENTO_CSV= ENTITIES_DIR / "entidades_con_sentimiento.csv"
     ENTIDADES_POR_DESTINO_CSV    = ENTITIES_DIR / "entidades_por_destino.csv"
     ENTIDADES_POR_TOPICO_CSV     = ENTITIES_DIR / "entidades_por_topico.csv"
-
     COOCCURRENCE_DIR             = ANALYSIS_DIR / "cooccurrence"
     COOCURRENCIA_ENTIDADES_CSV   = COOCCURRENCE_DIR / "coocurrencia_entidades.csv"
     COOCURRENCIA_TERMINOS_CSV    = COOCCURRENCE_DIR / "coocurrencia_terminos.csv"
     COMUNIDADES_ENTIDADES_CSV    = COOCCURRENCE_DIR / "comunidades_entidades.csv"
-
     TRENDS_DIR                   = ANALYSIS_DIR / "trends"
     TENDENCIAS_TOPICOS_DESTINO_CSV     = TRENDS_DIR / "tendencias_topicos_destino.csv"
     TENDENCIAS_SENTIMIENTO_TOPICO_CSV  = TRENDS_DIR / "tendencias_sentimiento_topico.csv"
     MICROTOPICOS_RESUMEN_CSV           = TRENDS_DIR / "microtopicos_resumen.csv"
     PERFIL_DESTINO_CSV                 = TRENDS_DIR / "perfil_destino.csv"
-
-    
     # Visualizaciones (output)
-
     VISUALIZATION_DIR            = DATA_DIR / "visualization"
 
 
