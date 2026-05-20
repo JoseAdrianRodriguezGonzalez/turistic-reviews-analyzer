@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 def process_pipeline(
     input_path: str,
-) -> tuple[list[tuple], list[tuple], list[tuple]]:
+) -> tuple[list[tuple], list[tuple], list[tuple], list[tuple]]:
     """
     Ejecuta el pipeline completo de preprocesamiento sobre el corpus crudo.
 
@@ -42,13 +42,13 @@ def process_pipeline(
         2. Detecta el idioma
         3. Aplica análisis lingüístico (POS, NER, noun phrases)
         4. Genera texto limpio con lematización
-        5. Clasifica en español, inglés o mixto
+        5. Clasifica en español, inglés, francés o mixto
 
     Parámetros:
         input_path : ruta al CSV maestro con columnas 'text', 'stars', 'location'
 
     Retorna:
-        Tupla de tres listas (spanish_results, english_results, mixed_results).
+        Tupla de cuatro listas (spanish_results, english_results, french_results, mixed_results).
         Cada elemento de la lista es una tupla:
             (dict_analisis, dict_limpio)
 
@@ -70,6 +70,7 @@ def process_pipeline(
 
     spanish_results: list[tuple] = []
     english_results: list[tuple] = []
+    french_results:  list[tuple] = []
     mixed_results:   list[tuple] = []
 
     for idx, row in df.iterrows():
@@ -127,6 +128,8 @@ def process_pipeline(
                 spanish_results.append((dict_analisis, dict_limpio))
             elif lang == "en":
                 english_results.append((dict_analisis, dict_limpio))
+            elif lang == "fr":
+                french_results.append((dict_analisis, dict_limpio))
             else:
                 mixed_results.append((dict_analisis, dict_limpio))
 
@@ -141,10 +144,11 @@ def process_pipeline(
             logger.info("Progreso: %d / %d comentarios procesados", idx + 1, total)
 
     logger.info(
-        "Preprocesamiento completado — es: %d | en: %d | mix: %d",
+        "Preprocesamiento completado — es: %d | en: %d | fr: %d | mix: %d",
         len(spanish_results),
         len(english_results),
+        len(french_results),
         len(mixed_results),
     )
 
-    return spanish_results, english_results, mixed_results
+    return spanish_results, english_results, french_results, mixed_results

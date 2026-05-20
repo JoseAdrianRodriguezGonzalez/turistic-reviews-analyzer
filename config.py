@@ -40,6 +40,7 @@ class Paths:
     # Datos por idioma (output del preprocesamiento)
     DATA_SPANISH_DIR  = DATA_DIR / "data_spanish"
     DATA_ENGLISH_DIR  = DATA_DIR / "data_english"
+    DATA_FRENCH_DIR   = DATA_DIR / "data_french"
     DATA_MIXED_DIR    = DATA_DIR / "data_mixed"
     SPANISH_CLEAN_CSV    = DATA_SPANISH_DIR / "clean.csv"
     SPANISH_ANALYSIS_CSV = DATA_SPANISH_DIR / "analysis.csv"
@@ -47,6 +48,9 @@ class Paths:
     ENGLISH_CLEAN_CSV    = DATA_ENGLISH_DIR / "clean.csv"
     ENGLISH_ANALYSIS_CSV = DATA_ENGLISH_DIR / "analysis.csv"
     ENGLISH_ANALYSIS_JSON= DATA_ENGLISH_DIR / "analysis.json"
+    FRENCH_CLEAN_CSV     = DATA_FRENCH_DIR  / "clean.csv"
+    FRENCH_ANALYSIS_CSV  = DATA_FRENCH_DIR  / "analysis.csv"
+    FRENCH_ANALYSIS_JSON = DATA_FRENCH_DIR  / "analysis.json"
     MIXED_CLEAN_CSV      = DATA_MIXED_DIR   / "clean.csv"
     MIXED_ANALYSIS_CSV   = DATA_MIXED_DIR   / "analysis.csv"
     MIXED_ANALYSIS_JSON  = DATA_MIXED_DIR   / "analysis.json"
@@ -140,6 +144,7 @@ class Params:
     #  Idiomas 
     LANG_SPANISH = "es"
     LANG_ENGLISH = "en"
+    LANG_FRENCH  = "fr"
     LANG_MIXED   = "mixed"
 
     #  Vocabulario 
@@ -220,6 +225,7 @@ class Params:
     EMBEDDING_MODEL      = "paraphrase-multilingual-MiniLM-L12-v2"
     SPACY_MODEL_ES       = "es_core_news_sm"
     SPACY_MODEL_EN       = "en_core_web_sm"
+    SPACY_MODEL_FR       = "fr_core_news_sm"
     TRANSLATION_MODEL    = "Helsinki-NLP/opus-mt-en-es"
 
 
@@ -264,6 +270,7 @@ def ensure_data_directories() -> None:
         Paths.RAW_INSTA,
         Paths.DATA_SPANISH_DIR,
         Paths.DATA_ENGLISH_DIR,
+        Paths.DATA_FRENCH_DIR,
         Paths.DATA_MIXED_DIR,
         Paths.TRANSLATIONS_DIR,
         Paths.UNIFIED_DIR,

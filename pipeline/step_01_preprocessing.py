@@ -6,9 +6,11 @@ Step 1: Preprocesamiento del corpus crudo.
 Input  : data/raw/complete.csv
 Output : data/data_spanish/clean.csv
          data/data_english/clean.csv
+         data/data_french/clean.csv
          data/data_mixed/clean.csv
          data/data_spanish/analysis.json
          data/data_english/analysis.json
+         data/data_french/analysis.json
          data/data_mixed/analysis.json
 """
 
@@ -36,6 +38,8 @@ class StepPreprocessing(BaseStep):
             Paths.SPANISH_ANALYSIS_JSON,
             Paths.ENGLISH_CLEAN_CSV,
             Paths.ENGLISH_ANALYSIS_JSON,
+            Paths.FRENCH_CLEAN_CSV,
+            Paths.FRENCH_ANALYSIS_JSON,
             Paths.MIXED_CLEAN_CSV,
             Paths.MIXED_ANALYSIS_JSON,
         ]
@@ -51,15 +55,16 @@ class StepPreprocessing(BaseStep):
         create_data_folders()
 
         logger.info("[%s] Ejecutando pipeline de preprocesamiento", self.name)
-        spanish, english, mixed = process_pipeline(str(Paths.RAW_COMPLETE_CSV))
+        spanish, english, french, mixed = process_pipeline(str(Paths.RAW_COMPLETE_CSV))
 
         logger.info(
-            "[%s] Documentos procesados — es: %d | en: %d | mix: %d",
-            self.name, len(spanish), len(english), len(mixed),
+            "[%s] Documentos procesados — es: %d | en: %d | fr: %d | mix: %d",
+            self.name, len(spanish), len(english), len(french), len(mixed),
         )
 
         save_results(spanish, "data_spanish")
         save_results(english, "data_english")
+        save_results(french, "data_french")
         save_results(mixed,   "data_mixed")
 
         logger.info("[%s] Resultados guardados por idioma", self.name)
