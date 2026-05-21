@@ -92,6 +92,56 @@ Ejemplos:
     )
 
     parser.add_argument(
+        "input_csv",
+        metavar="INPUT_CSV",
+        help=(
+            "Ruta al archivo CSV que contiene los datos. "
+            "Ejemplo: data/raw/google/huatulco.csv"
+        ),
+    )
+
+    parser.add_argument(
+        "text_column",
+        metavar="TEXT_COLUMN",
+        help=(
+            "Nombre de la columna dentro del CSV donde se encuentran "
+            "los comentarios textuales. Ejemplo: comentario"
+        ),
+    )
+
+    parser.add_argument(
+        "language",
+        metavar="LANGUAGE",
+        choices=sorted(SUPPORTED_LANGUAGES),
+        help=(
+            "Idioma objetivo del análisis. Afecta los modelos de "
+            "tokenización, stopwords y lematización. "
+            f"Opciones: {', '.join(sorted(SUPPORTED_LANGUAGES))}"
+        ),
+    )
+
+    parser.add_argument(
+        "title",
+        metavar="TITLE",
+        help=(
+            "Título del reporte usado en las visualizaciones y archivos "
+            'de salida. Ejemplo: "Análisis Riviera Maya 2024"'
+        ),
+    )
+
+    parser.add_argument(
+        "palette",
+        metavar="PALETTE",
+        help=(
+            "Paleta de colores para las gráficas. "
+            f"Accesibles recomendadas: {', '.join(sorted(ACCESSIBLE_PALETTES))}. "
+            "También se acepta cualquier paleta válida de matplotlib/plotly."
+        ),
+    )
+
+    # --- Parámetros opcionales ---
+
+    parser.add_argument(
         "--steps",
         nargs="+",
         metavar="STEP",
@@ -119,6 +169,39 @@ Ejemplos:
 
     return parser
 
+#VALIDACIONES
+def validar_args(args) -> None:
+    """
+    Valida los argumentos de entrada antes de ejecutar el pipeline.
+    Termina con sys.exit(1) si hay algún error crítico.
+    """
+    csv_path = Path(args.input_csv)
+
+    if not csv_path.exists():
+        logger.error(
+            "El archivo CSV no existe: %s\n"
+            "Verifica la ruta e intenta de nuevo.",
+            csv_path,
+        )
+        sys.exit(1)
+
+    if not csv_path.is_file():
+        logger.error("La ruta indicada no es un archivo: %s", csv_path)
+        sys.exit(1)
+
+    if csv_path.suffix.lower() != ".csv":
+        logger.warning(
+            "La extensión del archivo no es .csv (%s). "
+            "Se intentará procesar de todas formas.",
+            csv_path.suffix,
+        )
+
+    if args.palette not in ACCESSIBLE_PALETTES:
+        logger.warning(
+            "Paleta '%s' no es una de las accesibles recomendadas (%s).",
+            args.palette,
+            ", ".join(sorted(ACCESSIBLE_PALETTES)),
+        )
 
 # ACCIONES DEL CLI
 
