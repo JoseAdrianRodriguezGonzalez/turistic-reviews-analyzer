@@ -112,23 +112,30 @@ def _secondary_validation(text: str, primary_prediction: str) -> str:
     Evalúa qué tan buen resultado dio el modelo principal en texto corto o ambiguo.
     """
     # Sets de palabras exclusivas y comunes que NO suelen ser prestadas entre idiomas
-    es_stopwords = {"el", "la", "los", "las", "y", "es", "en", "a", "de", "fue", "por", "con", "pero", "son", "muy"} 
+    es_stopwords = {"el", "la", "los", "las", "y", "es", "en", "a", "de", "fue", "por", "con", "pero", "son", "muy", "porque", "para", "como", "estaba", "tiene"} 
     en_stopwords = {"the", "and", "is", "in", "it", "to", "of", "was", "for", "on", "this", "that", "with", "but", "are", "very"}
-    fr_stopwords = {"le", "la", "les", "et", "est", "dans", "il", "pour", "sur", "ce", "cette", "avec", "mais", "sont", "très"}
+    fr_stopwords = {"le", "la", "les", "et", "est", "dans", "il", "pour", "sur", "ce", "cette", "avec", "mais", "sont", "très", "être", "avoir"}
 
-    words = set(re.findall(r"\b\w+\b", text.lower()))
+    words = re.findall(r"\b\w+\b", text.lower())
 
     # Contar coincidencias
     scores = {
-        "es": len(words.intersection(es_stopwords)),
-        "en": len(words.intersection(en_stopwords)),
-        "fr": len(words.intersection(fr_stopwords)),
+        "es": sum(word in es_stopwords for word in words),
+        "en": sum(word in en_stopwords for word in words),
+        "fr": sum(word in fr_stopwords for word in words),
     }
 
     if max(scores.values()) == 0:
         return primary_prediction
     
-    return max(scores, key=scores.get)
+    best_score = max(scores.values())
+
+    best_langs = [lang for lang, score in scores.items() if score == best_score]
+
+    if len(best_langs) == 1:
+        return best_langs[0]
+
+    return "mixed"    
 
 
 def detect_language_type(text: str) -> str:
@@ -157,15 +164,22 @@ def detect_language_type(text: str) -> str:
         threshold = 0.95 if is_short else 0.85
 
         primary_lang = "mixed"
-        if probs.get("es", 0.0) > threshold:
-            primary_lang = "es"
-        if probs.get("en", 0.0) > threshold:
-            primary_lang = "en"
-        if probs.get("fr", 0.0) > threshold:
-            primary_lang = "fr"
+        
+        valid_langs = {
+            lang: prob for lang, prob in probs.items()
+
+            if lang in ["es", "en", "fr"] and prob > threshold
+        }
+
+        if len(valid_langs) == 1:
+            primary_lang = next(iter(valid_langs))
+        elif len(valid_langs) > 1:
+            primary_lang = "mixed"
+        else:
+            primary_lang = "mixed"
 
         # Validación secundaria para casos ambiguos o mixtos
-        if primary_lang in ["es", "en", "fr"] or primary_lang == "mixed":
+        if primary_lang in ["es", "en", "fr"]:
             if is_short or probs.get(primary_lang, 0.0) < 0.99:
                 return _secondary_validation(text, primary_lang)
 
