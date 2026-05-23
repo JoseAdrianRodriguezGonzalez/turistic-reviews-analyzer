@@ -106,6 +106,30 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # DETECCIÓN DE IDIOMA
+def _secondary_validation(text: str, primary_prediction: str) -> str:
+    """
+    Validación secundaria basada en palabras funcionales (stopwords/conectores).
+    Evalúa qué tan buen resultado dio el modelo principal en texto corto o ambiguo.
+    """
+    # Sets de palabras exclusivas y comunes que NO suelen ser prestadas entre idiomas
+    es_stopwords = {"el", "la", "los", "las", "y", "es", "en", "a", "de", "fue", "por", "con", "pero", "son", "muy"} 
+    en_stopwords = {"the", "and", "is", "in", "it", "to", "of", "was", "for", "on", "this", "that", "with", "but", "are", "very"}
+    fr_stopwords = {"le", "la", "les", "et", "est", "dans", "il", "pour", "sur", "ce", "cette", "avec", "mais", "sont", "très"}
+
+    words = set(re.findall(r"\b\w+\b", text.lower()))
+
+    # Contar coincidencias
+    scores = {
+        "es": len(words.intersection(es_stopwords)),
+        "en": len(words.intersection(en_stopwords)),
+        "fr": len(words.intersection(fr_stopwords)),
+    }
+
+    if max(scores.values()) == 0:
+        return primary_prediction
+    
+    return max(scores, key=scores.get)
+
 
 def detect_language_type(text: str) -> str:
     """
@@ -126,18 +150,26 @@ def detect_language_type(text: str) -> str:
 
         probs = {lang.lang: lang.prob for lang in langs}
 
-        if "es" in probs and "en" in probs and "fr" in probs:
-            if probs["es"] > 0.05 and probs["en"] > 0.05 and probs["fr"] > 0.05:
-                return "mixed"
+        tokens = text.split()
+        is_short = len(tokens) < 15 
 
-        if probs.get("es", 0.0) > 0.85:
-            return "es"
-        if probs.get("en", 0.0) > 0.85:
-            return "en"
-        if probs.get("fr", 0.0) > 0.85:
-            return "fr"
+        # Si el comentario es muy corto, exigimos un umbral más alto para evitar falsos positivos
+        threshold = 0.95 if is_short else 0.85
 
-        return "mixed"
+        primary_lang = "mixed"
+        if probs.get("es", 0.0) > threshold:
+            primary_lang = "es"
+        if probs.get("en", 0.0) > threshold:
+            primary_lang = "en"
+        if probs.get("fr", 0.0) > threshold:
+            primary_lang = "fr"
+
+        # Validación secundaria para casos ambiguos o mixtos
+        if primary_lang in ["es", "en", "fr"] or primary_lang == "mixed":
+            if is_short or probs.get(primary_lang, 0.0) < 0.99:
+                return _secondary_validation(text, primary_lang)
+
+        return primary_lang
 
     except LangDetectException:
         return "unknown"
