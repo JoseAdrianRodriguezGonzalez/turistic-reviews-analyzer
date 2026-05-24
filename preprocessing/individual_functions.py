@@ -34,6 +34,7 @@ DetectorFactory.seed = 0
 
 _nlp_es: spacy.language.Language | None = None
 _nlp_en: spacy.language.Language | None = None
+_nlp_fr: spacy.language.Language | None = None
 
 
 def _load_spacy_model(model_name: str) -> spacy.language.Language:
@@ -60,12 +61,12 @@ def get_nlp_model(lang: str) -> spacy.language.Language | None:
     Carga el modelo la primera vez que se solicita (lazy loading).
 
     Parámetros:
-        lang : 'es' para español, 'en' para inglés
+        lang : 'es' para español, 'en' para inglés, 'fr' para francés
 
     Retorna:
         Objeto nlp de spaCy o None si el idioma no está soportado
     """
-    global _nlp_es, _nlp_en
+    global _nlp_es, _nlp_en, _nlp_fr
 
     if lang == "es":
         if _nlp_es is None:
@@ -78,6 +79,12 @@ def get_nlp_model(lang: str) -> spacy.language.Language | None:
             logger.info("Cargando modelo spaCy: en_core_web_sm")
             _nlp_en = _load_spacy_model("en_core_web_sm")
         return _nlp_en
+
+    if lang == "fr":
+        if _nlp_fr is None:
+            logger.info("Cargando modelo spaCy: fr_core_news_sm")
+            _nlp_fr = _load_spacy_model("fr_core_news_sm")
+        return _nlp_fr
 
     return None
 
@@ -107,7 +114,8 @@ def detect_language_type(text: str) -> str:
     Retorna:
         'es'      si es español con alta confianza (> 0.85)
         'en'      si es inglés con alta confianza (> 0.85)
-        'mixed'   si hay mezcla de español e inglés
+        'fr'      si es francés con alta confianza (> 0.85)
+        'mixed'   si hay mezcla de español, inglés y francés con probabilidades significativas (> 0.05)
         'unknown' si la detección falla
     """
     try:
@@ -118,14 +126,16 @@ def detect_language_type(text: str) -> str:
 
         probs = {lang.lang: lang.prob for lang in langs}
 
-        if "es" in probs and "en" in probs:
-            if probs["es"] > 0.05 and probs["en"] > 0.05:
+        if "es" in probs and "en" in probs and "fr" in probs:
+            if probs["es"] > 0.05 and probs["en"] > 0.05 and probs["fr"] > 0.05:
                 return "mixed"
 
         if probs.get("es", 0.0) > 0.85:
             return "es"
         if probs.get("en", 0.0) > 0.85:
             return "en"
+        if probs.get("fr", 0.0) > 0.85:
+            return "fr"
 
         return "mixed"
 

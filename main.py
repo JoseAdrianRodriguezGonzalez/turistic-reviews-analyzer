@@ -1,5 +1,5 @@
 """
-main.py
+main.py 
 -------
 Punto de entrada del pipeline de análisis NLP de turismo.
 
@@ -12,6 +12,7 @@ Orquesta los 9 steps del pipeline con soporte para:
 Uso:
     # Ejecutar todo el pipeline
     python main.py
+    python main.py data/raw/google/huatulco.csv
 
     # Ejecutar solo pasos específicos
     python main.py --steps preprocessing translation vocabulary
@@ -33,8 +34,15 @@ import argparse
 import logging
 import sys
 import time
+from pathlib import Path
 
-from config import LoggingConfig, Paths, ensure_data_directories
+from config import (
+    LoggingConfig,
+    Params,
+    ACCESSIBLE_PALETTES,
+    SUPPORTED_LANGUAGES,
+    ensure_data_directories,
+)
 from pipeline import (
     StepAnalysis,
     StepClustering,
@@ -74,12 +82,31 @@ logger = logging.getLogger(__name__)
 def construir_parser() -> argparse.ArgumentParser:
     """
     Define los argumentos aceptados por el CLI.
+
+    Parámetros posicionales (obligatorios, issue #1):
+        input_csv    — ruta al CSV con los datos
+        text_column  — nombre de la columna de comentarios
+        language     — idioma objetivo (es | en | fr)
+        title        — título del reporte
+        palette      — paleta de colores para las gráficas
+
+    Parámetros opcionales:
+        --steps      — lista de steps a ejecutar
+        --force      — re-ejecutar aunque los outputs existan
+        --status     — mostrar estado del pipeline y salir
+        --list       — listar steps disponibles y salir
     """
     parser = argparse.ArgumentParser(
         prog="main.py",
-        description="Pipeline de análisis NLP de turismo — ejecuta todos o pasos específicos.",
+        description=(
+            "Pipeline de análisis NLP de comentarios turísticos.\n"
+            "Procesa un CSV y genera visualizaciones interactivas."
+        ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
+        epilog=f"""\
+Paletas accesibles recomendadas (daltonismo): {', '.join(sorted(ACCESSIBLE_PALETTES))}
+Idiomas soportados: {', '.join(sorted(SUPPORTED_LANGUAGES))}
+
 Ejemplos:
   python main.py                                 # ejecutar todo
   python main.py --steps preprocessing           # solo preprocesamiento
@@ -90,6 +117,58 @@ Ejemplos:
   python main.py --list                          # ver steps disponibles
         """,
     )
+
+    #Parámetros posicionales obligatorios
+
+    parser.add_argument(
+        "input_csv",
+        metavar="INPUT_CSV",
+        help=(
+            "Ruta al archivo CSV que contiene los datos. "
+            "Ejemplo: data/raw/google/huatulco.csv"
+        ),
+    )
+
+    parser.add_argument(
+        "text_column",
+        metavar="TEXT_COLUMN",
+        help=(
+            "Nombre de la columna dentro del CSV donde se encuentran "
+            "los comentarios textuales. Ejemplo: comentario"
+        ),
+    )
+
+    parser.add_argument(
+        "language",
+        metavar="LANGUAGE",
+        choices=sorted(SUPPORTED_LANGUAGES),
+        help=(
+            "Idioma objetivo del análisis. Afecta los modelos de "
+            "tokenización, stopwords y lematización. "
+            f"Opciones: {', '.join(sorted(SUPPORTED_LANGUAGES))}"
+        ),
+    )
+
+    parser.add_argument(
+        "title",
+        metavar="TITLE",
+        help=(
+            "Título del reporte usado en las visualizaciones y archivos "
+            'de salida. Ejemplo: "Análisis Riviera Maya 2024"'
+        ),
+    )
+
+    parser.add_argument(
+        "palette",
+        metavar="PALETTE",
+        help=(
+            "Paleta de colores para las gráficas. "
+            f"Accesibles recomendadas: {', '.join(sorted(ACCESSIBLE_PALETTES))}. "
+            "También se acepta cualquier paleta válida de matplotlib/plotly."
+        ),
+    )
+
+    #Parámetros opcionales
 
     parser.add_argument(
         "--steps",
@@ -120,6 +199,42 @@ Ejemplos:
     return parser
 
 
+# VALIDACIONES
+
+def validar_args(args) -> None:
+    """
+    Valida los argumentos de entrada antes de ejecutar el pipeline.
+    Termina con sys.exit(1) si hay algún error crítico.
+    """
+    csv_path = Path(args.input_csv)
+
+    if not csv_path.exists():
+        logger.error(
+            "El archivo CSV no existe: %s\n"
+            "Verifica la ruta e intenta de nuevo.",
+            csv_path,
+        )
+        sys.exit(1)
+
+    if not csv_path.is_file():
+        logger.error("La ruta indicada no es un archivo: %s", csv_path)
+        sys.exit(1)
+
+    if csv_path.suffix.lower() != ".csv":
+        logger.warning(
+            "La extensión del archivo no es .csv (%s). "
+            "Se intentará procesar de todas formas.",
+            csv_path.suffix,
+        )
+
+    if args.palette not in ACCESSIBLE_PALETTES:
+        logger.warning(
+            "Paleta '%s' no es una de las accesibles recomendadas (%s).",
+            args.palette,
+            ", ".join(sorted(ACCESSIBLE_PALETTES)),
+        )
+
+
 # ACCIONES DEL CLI
 
 def mostrar_lista() -> None:
@@ -143,12 +258,11 @@ def mostrar_status() -> None:
 
     for step in STEPS:
         try:
-            estado = step.status()
-            listo  = "✓ sí" if estado["listo_para_correr"] else "✗ faltan inputs"
+            estado    = step.status()
+            listo     = "✓ sí" if estado["listo_para_correr"] else "✗ faltan inputs"
             ejecutado = "✓ sí" if estado["ya_ejecutado"]      else "✗ pendiente"
             print(f"  {step.name:<25} {listo:<22} {ejecutado}")
 
-            # Mostrar inputs faltantes si los hay
             for faltante in estado["inputs_faltantes"]:
                 print(f"    ↳ input faltante: {faltante}")
 
@@ -197,8 +311,10 @@ def ejecutar_pipeline(steps: list, force: bool) -> None:
     fallidos = []
 
     inicio_total = time.time()
-
     logger.info("Pipeline iniciado — %d step(s) a ejecutar", total)
+    logger.info("Título del reporte : %s", Params.REPORT_TITLE)
+    logger.info("Idioma             : %s", Params.LANGUAGE)
+    logger.info("Paleta de colores  : %s", Params.COLOR_PALETTE)
 
     for step in steps:
         exito = step.run(force=force)
@@ -209,7 +325,6 @@ def ejecutar_pipeline(steps: list, force: bool) -> None:
 
     duracion_total = time.time() - inicio_total
 
-    # --- Resumen final ---
     logger.info("=" * 55)
     logger.info(
         "Pipeline finalizado en %.1f s — %d/%d steps exitosos",
@@ -224,7 +339,6 @@ def ejecutar_pipeline(steps: list, force: bool) -> None:
 
 # PUNTO DE ENTRADA
 
-
 def main() -> None:
     """
     Función principal. Parsea argumentos y ejecuta la acción correspondiente.
@@ -234,7 +348,13 @@ def main() -> None:
     parser = construir_parser()
     args   = parser.parse_args()
 
-    # --- Acciones informativas (no ejecutan el pipeline) ---
+    # Inyectar parámetros de usuario en Params (issue #1)
+    Params.set_from_args(args)
+
+    # Validar entradas
+    validar_args(args)
+
+    # Acciones informativas (no ejecutan el pipeline)
     if args.list:
         mostrar_lista()
         sys.exit(0)
@@ -243,17 +363,15 @@ def main() -> None:
         mostrar_status()
         sys.exit(0)
 
-    # --- Preparar la caja de datos ---
+    # Preparar carpetas de datos
     try:
         ensure_data_directories()
     except Exception as error:
         logger.error("No se pudieron crear las carpetas de datos: %s", error)
         sys.exit(1)
 
-    # --- Resolver qué steps correr ---
+    # Resolver qué steps correr y ejecutar
     steps = resolver_steps(args.steps)
-
-    # --- Ejecutar ---
     ejecutar_pipeline(steps=steps, force=args.force)
 
 
