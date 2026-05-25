@@ -1,6 +1,6 @@
 '''
 sentiment_analysis.py
----------------------
+
 Bloque 8 — Análisis de sentimiento y emoción a partir de:
     1. Estrellas (rating) como proxy de sentimiento supervisado
     2. Distribución léxica POS como proxy de intensidad emocional
@@ -13,12 +13,19 @@ Lógica de sentimiento basada en estrellas:
     null -> sin_etiqueta (para documentos sin rating, ej. Instagram)
 
 Columnas de salida principales:
-    sentimiento_estrella    -- negativo / neutro / positivo / sin_etiqueta
-    sentimiento_numerico    -- -1 / 0 / 1 / NaN
-    intensidad_adjetivo     -- ratio de adjetivos en el documento (POS)
-    intensidad_adverbio     -- ratio de adverbios en el documento (POS)
+    sentimiento_estrella      -- negativo / neutro / positivo / sin_etiqueta  (basado en estrellas)
+    sentimiento_numerico      -- -1 / 0 / 1 / NaN
+    sentimiento_binario_estrellas -- clasificación binaria por umbral de estrellas (validación)
+    etiqueta_transformer      -- positivo / negativo / neutro  (modelo transformer, todos los docs)
+    confianza_transformer     -- score del transformer [0, 1]
+    etiqueta_robusto          -- predicción del clasificador supervisado (solo método robusto)
+    sentimiento_binario       -- clasificación definitiva del transformer (neutro → negativo)
+    intensidad_adjetivo       -- ratio de adjetivos en el documento (POS)
+    intensidad_adverbio       -- ratio de adverbios en el documento (POS)
 
 Agrupaciones exportadas:
+    comentarios_positivos.csv        -- documentos con sentimiento_binario == positivo
+    comentarios_negativos.csv        -- documentos con sentimiento_binario == negativo
     sentimiento_por_topico.csv       -- distribución por tópico BERTopic
     sentimiento_por_destino.csv      -- distribución por location
     sentimiento_por_topico_destino.csv -- cruce tópico x destino
@@ -34,6 +41,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from config import Params
+
 logger = logging.getLogger(__name__)
 
 # ======================================================
@@ -44,10 +53,11 @@ BASE_DIR   = Path(__file__).resolve().parent.parent
 DATA_DIR   = BASE_DIR / 'data'
 OUTPUT_DIR = DATA_DIR / 'analysis' / 'sentiment'
 
-PATH_DOCS_TOPICS   = BASE_DIR /'data'/ 'results'  / 'docs_with_topics.csv'
-PATH_UNIFIED       = BASE_DIR  /'data'/ 'unified'  / 'analysis_unified.csv'
-PATH_FEATURES      = BASE_DIR  /'data'/ 'features'  / 'features_nlp.csv'
-PATH_TOPICS_META   = BASE_DIR  /'data'/ 'results'  / 'topics.csv'
+PATH_DOCS_TOPICS   = BASE_DIR / 'data' / 'results'      / 'docs_with_topics.csv'
+PATH_UNIFIED       = BASE_DIR / 'data' / 'unified'      / 'analysis_unified.csv'
+PATH_FEATURES      = BASE_DIR / 'data' / 'features'     / 'features_nlp.csv'
+PATH_TOPICS_META   = BASE_DIR / 'data' / 'results'      / 'topics.csv'
+PATH_NORMALIZED    = BASE_DIR / 'data' / 'translations' / 'normalized_spanish.csv'
 
 
 # ======================================================
@@ -90,6 +100,25 @@ def _mapear_sentimiento_numerico(categoria: pd.Series) -> pd.Series:
     return categoria.map(mapa)
 
 
+def _mapear_sentimiento_binario(sentimiento_estrella: pd.Series) -> pd.Series:
+    '''
+    Colapsa la clasificación de 3 clases a binaria usando umbral de polaridad.
+    Neutro se incluye en negativo porque 3 estrellas no es una recomendación.
+        positivo  -> positivo  (4-5 estrellas)
+        neutro    -> negativo  (3 estrellas, umbral no alcanzado)
+        negativo  -> negativo  (1-2 estrellas)
+        sin_etiqueta -> sin_etiqueta
+    '''
+    def _binarizar(cat):
+        if cat in ('negativo', 'neutro'):
+            return 'negativo'
+        if cat == 'positivo':
+            return 'positivo'
+        return 'sin_etiqueta'
+
+    return sentimiento_estrella.apply(_binarizar)
+
+
 # ======================================================
 # CARGA Y ENSAMBLADO
 # ======================================================
@@ -97,9 +126,10 @@ def _mapear_sentimiento_numerico(categoria: pd.Series) -> pd.Series:
 def _cargar_corpus_base() -> pd.DataFrame:
     '''
     Carga y ensambla el corpus base unificando:
-        - docs_with_topics.csv (topic, location, lang)
-        - analysis_unified.csv (estrellas)
-        - features_nlp.csv     (pos_ratio_adj, pos_ratio_adv)
+        - docs_with_topics.csv  (topic, location, lang)
+        - analysis_unified.csv  (estrellas, texto original)
+        - normalized_spanish.csv (texto limpio para vectorizadores)
+        - features_nlp.csv      (pos_ratio_adj, pos_ratio_adv)
 
     El join se hace por indice. Los campos faltantes se rellenan con NaN.
     '''
@@ -107,7 +137,16 @@ def _cargar_corpus_base() -> pd.DataFrame:
     df_docs = pd.read_csv(PATH_DOCS_TOPICS)
 
     logger.info('Cargando analysis_unified.csv...')
-    df_unified = pd.read_csv(PATH_UNIFIED, usecols=['indice', 'estrellas'])
+    df_unified_all = pd.read_csv(PATH_UNIFIED)
+    cols_unified = ['indice', 'estrellas']
+    # Cargar texto original si está disponible
+    col_comentario = Params.COLUMNA_COMENTARIO
+    if col_comentario in df_unified_all.columns:
+        cols_unified.append(col_comentario)
+    df_unified = df_unified_all[cols_unified]
+
+    logger.info('Cargando normalized_spanish.csv...')
+    df_normalized = pd.read_csv(PATH_NORMALIZED, usecols=['indice', Params.COLUMNA_TEXTO])
 
     logger.info('Cargando features_nlp.csv...')
     df_features = pd.read_csv(
@@ -115,8 +154,8 @@ def _cargar_corpus_base() -> pd.DataFrame:
         usecols=['indice', 'pos_ratio_adj', 'pos_ratio_adv'],
     )
 
-    # Join por indice
     df = df_docs.merge(df_unified, on='indice', how='left')
+    df = df.merge(df_normalized, on='indice', how='left')
     df = df.merge(df_features, on='indice', how='left')
 
     logger.info(
@@ -129,13 +168,16 @@ def _cargar_corpus_base() -> pd.DataFrame:
 
 def _construir_sentimiento(df: pd.DataFrame) -> pd.DataFrame:
     '''
-    Añade columnas de sentimiento al DataFrame del corpus.
+    Añade columnas de sentimiento basadas en estrellas al corpus.
+    sentimiento_binario_estrellas se guarda como referencia de validación;
+    el sentimiento_binario definitivo lo asigna el transformer en run_sentiment_analysis().
     '''
     df = df.copy()
-    df['sentimiento_estrella']  = _mapear_sentimiento_estrella(df['estrellas'])
-    df['sentimiento_numerico']  = _mapear_sentimiento_numerico(df['sentimiento_estrella'])
-    df['intensidad_adjetivo']   = df['pos_ratio_adj'].fillna(0.0)
-    df['intensidad_adverbio']   = df['pos_ratio_adv'].fillna(0.0)
+    df['sentimiento_estrella']          = _mapear_sentimiento_estrella(df['estrellas'])
+    df['sentimiento_numerico']          = _mapear_sentimiento_numerico(df['sentimiento_estrella'])
+    df['sentimiento_binario_estrellas'] = _mapear_sentimiento_binario(df['sentimiento_estrella'])
+    df['intensidad_adjetivo']           = df['pos_ratio_adj'].fillna(0.0)
+    df['intensidad_adverbio']           = df['pos_ratio_adv'].fillna(0.0)
     return df
 
 
@@ -295,9 +337,44 @@ def _sentimiento_por_topico_destino(df: pd.DataFrame) -> pd.DataFrame:
     return tabla
 
 
+def _exportar_grupos_binarios(
+    df: pd.DataFrame,
+    output_dir: Path,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    '''
+    Filtra el corpus en dos grupos según sentimiento_binario y los exporta.
+    Solo incluye documentos clasificables (excluye sin_etiqueta).
+    '''
+    df_positivos = df[df['sentimiento_binario'] == 'positivo'].reset_index(drop=True)
+    df_negativos = df[df['sentimiento_binario'] == 'negativo'].reset_index(drop=True)
+
+    df_positivos.to_csv(output_dir / 'comentarios_positivos.csv', index=False, encoding='utf-8-sig')
+    df_negativos.to_csv(output_dir / 'comentarios_negativos.csv', index=False, encoding='utf-8-sig')
+
+    logger.info(
+        'Grupos binarios exportados: %d positivos | %d negativos | %d sin_etiqueta',
+        len(df_positivos),
+        len(df_negativos),
+        (df['sentimiento_binario'] == 'sin_etiqueta').sum(),
+    )
+    return df_positivos, df_negativos
+
+
 # ======================================================
 # PIPELINE PRINCIPAL
 # ======================================================
+
+def _binarizar_etiqueta_transformer(etiqueta: str) -> str:
+    '''
+    Colapsa neutro en negativo para producir la clasificación binaria final.
+    Neutro significa ambigüedad, no recomendación positiva.
+    '''
+    if etiqueta == 'positivo':
+        return 'positivo'
+    if etiqueta in ('negativo', 'neutro'):
+        return 'negativo'
+    return 'sin_etiqueta'
+
 
 def run_sentiment_analysis(
     output_dir: Path = OUTPUT_DIR,
@@ -305,38 +382,68 @@ def run_sentiment_analysis(
     '''
     Pipeline completo de análisis de sentimiento.
 
-    Retorna diccionario con los tres DataFrames producidos:
-        por_topico, por_destino, por_topico_destino
+    Clasifica cada documento con un transformer (independiente de estrellas)
+    y opcionalmente refina con un clasificador supervisado sobre embeddings.
+    La configuración del método se lee desde Params (SENTIMENT_METODO,
+    SENTIMENT_IDIOMA, SENTIMENT_TEXTO, SENTIMENT_FEATURES).
+
+    Retorna diccionario con:
+        corpus, positivos, negativos, por_topico, por_destino, por_topico_destino
     '''
+    from analysis.transformer_sentiment import run_transformer_sentiment
+
     output_dir.mkdir(parents=True, exist_ok=True)
     logger.info('=== Iniciando análisis de sentimiento ===')
 
-    # Cargar metadatos de tópicos (opcional, para añadir nombres)
     topics_meta = None
     if PATH_TOPICS_META.exists():
         topics_meta = pd.read_csv(PATH_TOPICS_META)
         logger.info('Metadatos de tópicos cargados: %d tópicos', len(topics_meta))
 
-    # Ensamblar corpus y añadir columnas de sentimiento
     df = _cargar_corpus_base()
     df = _construir_sentimiento(df)
 
     logger.info(
-        'Distribución de sentimiento global: %s',
+        'Distribución por estrellas (referencia): %s',
         df['sentimiento_estrella'].value_counts().to_dict(),
     )
 
-    # Guardar corpus enriquecido con sentimiento
+    # Clasificación con transformer — funciona para TODOS los documentos
+    col_original = Params.COLUMNA_COMENTARIO
+    col_cleaned  = Params.COLUMNA_TEXTO
+
+    textos_orig    = df.get(col_original, pd.Series([''] * len(df), index=df.index))
+    textos_cleaned = df.get(col_cleaned,  pd.Series([''] * len(df), index=df.index))
+
+    df_transformer = run_transformer_sentiment(
+        textos_originales  = textos_orig,
+        textos_cleaned     = textos_cleaned,
+        idioma             = Params.SENTIMENT_IDIOMA,
+        metodo             = Params.SENTIMENT_METODO,
+        usar_texto_original= Params.SENTIMENT_TEXTO == 'original',
+        features           = Params.SENTIMENT_FEATURES,
+    )
+
+    df = df.join(df_transformer)
+
+    # sentimiento_binario definitivo viene del transformer (cubre Instagram y similares)
+    df['sentimiento_binario'] = df['etiqueta_final'].apply(_binarizar_etiqueta_transformer)
+
+    logger.info(
+        'Distribución transformer (binario final): %s',
+        df['sentimiento_binario'].value_counts().to_dict(),
+    )
+
     path_corpus = output_dir / 'corpus_con_sentimiento.csv'
     df.to_csv(path_corpus, index=False, encoding='utf-8-sig')
     logger.info('Corpus con sentimiento exportado: %s', path_corpus)
 
-    # Calcular agrupaciones
-    df_por_topico = _sentimiento_por_topico(df, topics_meta)
-    df_por_destino = _sentimiento_por_destino(df)
-    df_cruce = _sentimiento_por_topico_destino(df)
+    df_positivos, df_negativos = _exportar_grupos_binarios(df, output_dir)
 
-    # Exportar
+    df_por_topico  = _sentimiento_por_topico(df, topics_meta)
+    df_por_destino = _sentimiento_por_destino(df)
+    df_cruce       = _sentimiento_por_topico_destino(df)
+
     df_por_topico.to_csv(
         output_dir / 'sentimiento_por_topico.csv',
         index=False, encoding='utf-8-sig',
@@ -353,10 +460,12 @@ def run_sentiment_analysis(
     logger.info('=== Análisis de sentimiento completado. Archivos en: %s ===', output_dir)
 
     return {
-        'corpus'              : df,
-        'por_topico'          : df_por_topico,
-        'por_destino'         : df_por_destino,
-        'por_topico_destino'  : df_cruce,
+        'corpus'             : df,
+        'positivos'          : df_positivos,
+        'negativos'          : df_negativos,
+        'por_topico'         : df_por_topico,
+        'por_destino'        : df_por_destino,
+        'por_topico_destino' : df_cruce,
     }
 
 

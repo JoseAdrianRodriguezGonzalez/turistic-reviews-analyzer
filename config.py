@@ -249,6 +249,16 @@ class Params:
     SPACY_MODEL_FR       = "fr_core_news_sm"
     TRANSLATION_MODEL    = "Helsinki-NLP/opus-mt-en-es"
 
+    # --- Análisis de sentimiento (transformer) ---
+    # Idioma del modelo: 'es' (español) o 'multi' (multilingüe)
+    SENTIMENT_IDIOMA   : str       = 'es'
+    # Método: 'rapido' (solo transformer) o 'robusto' (transformer + clasificador supervisado)
+    SENTIMENT_METODO   : str       = 'rapido'
+    # Texto que se pasa al transformer: 'original' o 'cleaned'
+    SENTIMENT_TEXTO    : str       = 'original'
+    # Features para el método robusto (cualquier combinación de embeddings, tfidf, yake)
+    SENTIMENT_FEATURES : list[str] = ['embeddings']
+
     @classmethod
     def set_from_args(cls, args) -> None:
         """
@@ -267,6 +277,16 @@ class Params:
         cls.LANGUAGE = args.language
         cls.REPORT_TITLE = args.title
         cls.COLOR_PALETTE = args.palette
+
+        # Parámetros opcionales del análisis de sentimiento
+        if getattr(args, 'sentiment_idioma', None):
+            cls.SENTIMENT_IDIOMA = args.sentiment_idioma
+        if getattr(args, 'sentiment_metodo', None):
+            cls.SENTIMENT_METODO = args.sentiment_metodo
+        if getattr(args, 'sentiment_texto', None):
+            cls.SENTIMENT_TEXTO = args.sentiment_texto
+        if getattr(args, 'sentiment_features', None):
+            cls.SENTIMENT_FEATURES = args.sentiment_features
 
         # Redirigir el CSV de entrada para que el pipeline lo use
         Paths.RAW_COMPLETE_CSV = cls.INPUT_CSV
