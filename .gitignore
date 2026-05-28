@@ -1,0 +1,12 @@
+__pycache__/
+.claude/
+terminal.txt
+README.md
+CONTEXT.md
+
+data/data_english
+data/data_french
+data/data_spanish
+data/data_mixed
+
+data/raw/complete.csv
