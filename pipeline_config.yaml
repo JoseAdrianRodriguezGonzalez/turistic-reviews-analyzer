@@ -1,0 +1,113 @@
+# pipeline_config.yaml
+# --------------------
+# Configuración automática del pipeline de análisis NLP turístico.
+# Usado cuando se ejecuta: python main.py ... --mode automatic
+#
+# Solo las claves presentes aquí sobreescriben los defaults de Params.
+# Puedes comentar cualquier línea para dejar el default del sistema.
+
+
+global:
+  # Semilla de aleatoriedad para UMAP, IsolationForest y TruncatedSVD
+  random_state: 42
+  # Modelo de embeddings (debe coincidir con el usado al generar docs_with_topics.npy)
+  # Opciones: 'paraphrase-multilingual-MiniLM-L12-v2', 'sentence-transformers/LaBSE'
+  embedding_model: "paraphrase-multilingual-MiniLM-L12-v2"
+
+
+# Step 05 — Semántica / BERTopic
+step_05_semantic:
+  bertopic:
+    umap:
+      # Vecinos locales para UMAP: más alto = estructura global, más bajo = local
+      # Rango típico: 5–50
+      n_neighbors: 30
+      # Dimensiones intermedias antes de HDBSCAN; más alto = más información, más lento
+      # Rango típico: 5–15
+      n_components: 8
+      # 0.0 produce clusters compactos; aumentar (0.1–0.5) para distribuciones más uniformes
+      min_dist: 0.0
+      # Métrica de distancia: 'cosine' (recomendado para embeddings) o 'euclidean'
+      metric: "cosine"
+    hdbscan:
+      # Tamaño mínimo de tópico; aumentar = menos tópicos y más grandes
+      # Rango típico: 10–50
+      min_cluster_size: 15
+      metric: "euclidean"
+      # 'eom' (excess of mass) = tópicos más grandes y estables
+      # 'leaf' = más tópicos pequeños y específicos
+      cluster_selection_method: "eom"
+      calculate_probabilities: true
+    # Lote de documentos por pasada en SentenceTransformer; aumentar si hay GPU
+    # Rango típico: 32–256
+    batch_size: 64
+
+
+# Step 06 — Clustering
+step_06_clustering:
+  # Componentes de SVD antes de UMAP para matrices TF-IDF / YAKE
+  # Rango típico: 30–100 (limitado por el vocabulario del corpus)
+  svd_components: 50
+  # Dimensiones finales de UMAP para todos los algoritmos de clustering
+  umap_components: 2
+  # Vecinos del grafo kNN en clustering jerárquico (solo corpus > 10 000 docs)
+  # Rango típico: 5–20
+  jerarquico_knn_vecinos: 10
+  # Peso del silhouette score en la métrica combinada de KMeans (alpha_kmeans·silhouette + (1-alpha)·inercia_norm)
+  # Rango: 0.0–1.0
+  alpha_kmeans: 0.7
+  # Porcentaje máximo de documentos en un solo cluster; clusters más grandes se penalizan
+  # Rango: 0.5–0.95
+  max_cluster_pct: 0.80
+
+
+# Step 08 — Análisis
+step_08_analysis:
+
+  sentiment:
+    # Modelo transformer a usar
+    # 'es'    → pysentimiento/robertuito-sentiment-analysis (solo español, más preciso)
+    # 'multi' → cardiffnlp/twitter-xlm-roberta-base-sentiment (multilingüe)
+    idioma: "es"
+    # Método de clasificación
+    # 'rapido'  → solo transformer (recomendado para corpus grandes)
+    # 'robusto' → transformer + LogisticRegression entrenada sobre features
+    metodo: "rapido"
+    # Texto que se pasa al transformer
+    # 'original' → texto sin procesar (recomendado, conserva palabras de sentimiento)
+    # 'cleaned'  → texto lematizado
+    texto: "original"
+    # Features para el método robusto; combinables
+    # Opciones: 'embeddings', 'tfidf', 'yake'
+    features: ["embeddings"]
+    # Lote de documentos por pasada del transformer; aumentar si hay GPU
+    # Rango típico: 16–128
+    batch_size: 32
+    # Longitud máxima de tokens; 512 es el límite de la mayoría de modelos BERT
+    max_length: 512
+    # LogisticRegression — hiperparámetros del método robusto
+    lr_max_iter: 1000   # aumentar si no converge (warning de sklearn)
+    lr_c: 1.0           # inverso de regularización L2; menor = más regularización
+    # Solver: 'lbfgs' (recomendado), 'saga' (datasets muy grandes), 'liblinear'
+    lr_solver: "lbfgs"
+
+  outliers:
+    # Fracción esperada de documentos atípicos (afecta IsolationForest, SVM y LOF)
+    # Rango: 0.01–0.20
+    contamination: 0.05
+    # Vecinos para Local Outlier Factor
+    # Rango típico: 10–50
+    knn_neighbors: 20
+    # Votos mínimos (de 3 modelos) para declarar outlier
+    # 1 = máxima sensibilidad | 2 = balance | 3 = máxima especificidad
+    umbral_ensemble: 2
+    # Máximo de muestras de entrenamiento para One-Class SVM (O(n²) en RAM)
+    # Reducir si el proceso se queda sin memoria; aumentar solo con RAM suficiente
+    svm_max_train: 8000
+
+  sentiment_topics:
+    # Documentos mínimos por grupo de sentimiento para aplicar BERTopic
+    # Si es menor se usa conteo de frecuencias de palabras como fallback
+    min_docs: 50
+    # Top-N comentarios más similares al concepto 'precio / valor / costo'
+    precio_valor_costo_top_n: 5
