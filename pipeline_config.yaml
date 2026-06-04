@@ -1,0 +1,209 @@
+# pipeline_config.yaml
+# --------------------
+# Configuración automática del pipeline de análisis NLP turístico.
+# Usado cuando se ejecuta: python main.py ... --mode automatic
+#
+# Solo las claves presentes aquí sobreescriben los defaults de Params.
+# Puedes comentar cualquier línea para dejar el default del sistema.
+
+
+global:
+  # Semilla de aleatoriedad para UMAP, IsolationForest, TruncatedSVD y langdetect
+  random_state: 42
+  # Modelo de embeddings (debe coincidir con el usado al generar docs_with_topics.npy)
+  # Opciones: 'paraphrase-multilingual-MiniLM-L12-v2', 'sentence-transformers/LaBSE'
+  embedding_model: "paraphrase-multilingual-MiniLM-L12-v2"
+
+
+# Step 01 — Preprocesamiento
+step_01_preprocessing:
+  language_detection:
+    # Número de palabras por debajo del cual el texto se considera "corto"
+    # Textos cortos usan un umbral de confianza más estricto para evitar falsos positivos
+    # Rango típico: 10–20
+    short_text_threshold: 15
+    # Umbral de confianza para textos cortos (más estricto)
+    # Rango: 0.85–0.99
+    confidence_high: 0.95
+    # Umbral de confianza para textos de longitud normal
+    # Rango: 0.70–0.95
+    confidence_normal: 0.85
+    # Por debajo de este valor se activa la validación secundaria por stopwords
+    # Rango: 0.90–1.0
+    confidence_secondary: 0.99
+
+
+# Step 02 — Traducción
+step_02_translation:
+  # Documentos por lote para el modelo MarianMT
+  # 32 es seguro para GPUs con 4–8 GB VRAM; subir solo si tienes >8 GB
+  batch_size: 32
+  # Longitud máxima de tokens; reseñas turísticas raramente superan 100 palabras
+  # 256 reduce ~50% la memoria vs 512 sin perder calidad en textos cortos
+  max_length: 256
+  # Beams para generación: 1=greedy (~4x más rápido, calidad suficiente para reseñas cortas)
+  # 4=beam search (calidad máxima, lento); rango: 1–5
+  num_beams: 1
+
+
+# Step 04 — Feature Engineering
+step_04_features:
+  # Documentos por lote para nlp.pipe() de spaCy (POS tagging y NER)
+  # Aumentar con más RAM disponible; rango típico: 32–256
+  spacy_batch_size: 64
+
+
+# Step 05 — Semántica / BERTopic
+step_05_semantic:
+  bertopic:
+    umap:
+      # Vecinos locales para UMAP: más alto = estructura global, más bajo = local
+      # Rango típico: 5–50
+      n_neighbors: 30
+      # Dimensiones intermedias antes de HDBSCAN; más alto = más información, más lento
+      # Rango típico: 5–15
+      n_components: 8
+      # 0.0 produce clusters compactos; aumentar (0.1–0.5) para distribuciones más uniformes
+      min_dist: 0.0
+      # Métrica de distancia: 'cosine' (recomendado para embeddings) o 'euclidean'
+      metric: "cosine"
+    hdbscan:
+      # Tamaño mínimo de tópico; aumentar = menos tópicos y más grandes
+      # Rango típico: 10–50
+      min_cluster_size: 15
+      metric: "euclidean"
+      # 'eom' (excess of mass) = tópicos más grandes y estables
+      # 'leaf' = más tópicos pequeños y específicos
+      cluster_selection_method: "eom"
+      calculate_probabilities: true
+    # Lote de documentos por pasada en SentenceTransformer; aumentar si hay GPU
+    # Rango típico: 32–256; GPU: 128–256
+    batch_size: 128
+  tfidf:
+    # Mínimo de documentos en los que debe aparecer un término (absoluto o fracción)
+    # Rango típico: 1–10 o 0.01–0.10
+    min_df: 2
+    # Máximo de documentos en los que puede aparecer un término (fracción)
+    # Términos en más del 90% de documentos se consideran stopwords
+    max_df: 0.9
+    # Rango de n-gramas: (1,1)=unigramas, (1,2)=uni+bigramas, (2,2)=solo bigramas
+    ngram_min: 1
+    ngram_max: 2
+    # Límite de features; null = sin límite (usar vocabulario completo)
+    max_features: null
+  yake:
+    # Código de idioma para YAKE
+    language: "es"
+    # Tamaño de n-gramas para extracción de keywords
+    # Rango: 1–3
+    ngram: 2
+    # Top-K keywords a extraer por documento
+    # Rango típico: 3–10
+    top_k: 5
+  ner:
+    # Umbral de similitud (0–100) para fusionar entidades similares con rapidfuzz
+    # Mayor = más estricto (menos fusión); menor = más agresivo
+    merge_threshold: 90
+
+
+# Step 07 — Topic Enrichment
+step_07_enrichment:
+  hierarchy:
+    # Método de enlace para la jerarquía de clusters: ward, complete, average, single
+    # ward produce clusters más compactos y esféricos (recomendado)
+    linkage_method: "ward"
+    # Métrica de distancia (ward solo admite euclidean)
+    linkage_metric: "euclidean"
+  llm:
+    # Parámetros del modelo LLM local para topic naming (requiere llama_cpp)
+    # Solo aplica si se activa topic naming; el módulo está PENDIENTE
+    n_ctx: 1024        # Tamaño de contexto del modelo
+    n_threads: 8       # Hilos de CPU para inferencia
+    n_gpu_layers: 20   # Capas en GPU; 0 = solo CPU
+    temperature: 0.3   # Temperatura de muestreo (0=determinista, 1=creativo)
+    max_tokens: 20     # Tokens máximos en la respuesta del nombre
+    top_docs: 3        # Documentos de ejemplo que se pasan al LLM por cluster
+
+
+# Step 06 — Clustering
+step_06_clustering:
+  # Componentes de SVD antes de UMAP para matrices TF-IDF / YAKE
+  # Rango típico: 30–100 (limitado por el vocabulario del corpus)
+  svd_components: 50
+  # Dimensiones finales de UMAP para todos los algoritmos de clustering
+  umap_components: 2
+  # Vecinos del grafo kNN en clustering jerárquico (solo corpus > 10 000 docs)
+  # Rango típico: 5–30; más vecinos = grafo más conectado, menos componentes aislados
+  # Con 10 aparecen 37 componentes desconectados en la proyección UMAP; 30 los elimina
+  jerarquico_knn_vecinos: 30
+  # Peso del silhouette score en la métrica combinada de KMeans (alpha_kmeans·silhouette + (1-alpha)·inercia_norm)
+  # Rango: 0.0–1.0
+  alpha_kmeans: 0.7
+  # Porcentaje máximo de documentos en un solo cluster; clusters más grandes se penalizan
+  # Rango: 0.5–0.95
+  max_cluster_pct: 0.80
+
+
+# Step 08 — Análisis
+step_08_analysis:
+
+  sentiment:
+    # Modelo transformer a usar
+    # 'es'    → pysentimiento/robertuito-sentiment-analysis (solo español, más preciso)
+    # 'multi' → cardiffnlp/twitter-xlm-roberta-base-sentiment (multilingüe)
+    idioma: "es"
+    # Método de clasificación
+    # 'rapido'  → solo transformer (recomendado para corpus grandes)
+    # 'robusto' → transformer + LogisticRegression entrenada sobre features
+    metodo: "rapido"
+    # Texto que se pasa al transformer
+    # 'original' → texto sin procesar (recomendado, conserva palabras de sentimiento)
+    # 'cleaned'  → texto lematizado
+    texto: "original"
+    # Features para el método robusto; combinables
+    # Opciones: 'embeddings', 'tfidf', 'yake'
+    features: ["embeddings"]
+    # Lote de documentos por pasada del transformer; aumentar si hay GPU
+    # Rango típico: 16–128; GPU: 64–128
+    batch_size: 64
+    # Longitud máxima de tokens; 512 es el límite de la mayoría de modelos BERT
+    max_length: 512
+    # LogisticRegression — hiperparámetros del método robusto
+    lr_max_iter: 1000   # aumentar si no converge (warning de sklearn)
+    lr_c: 1.0           # inverso de regularización L2; menor = más regularización
+    # Solver: 'lbfgs' (recomendado), 'saga' (datasets muy grandes), 'liblinear'
+    lr_solver: "lbfgs"
+
+  outliers:
+    # Fracción esperada de documentos atípicos (afecta IsolationForest, SVM y LOF)
+    # Rango: 0.01–0.20
+    contamination: 0.05
+    # Vecinos para Local Outlier Factor
+    # Rango típico: 10–50
+    knn_neighbors: 20
+    # Votos mínimos (de 3 modelos) para declarar outlier
+    # 1 = máxima sensibilidad | 2 = balance | 3 = máxima especificidad
+    umbral_ensemble: 2
+    # Máximo de muestras de entrenamiento para One-Class SVM (O(n²) en RAM)
+    # Reducir si el proceso se queda sin memoria; aumentar solo con RAM suficiente
+    svm_max_train: 8000
+
+  sentiment_topics:
+    # Documentos mínimos por grupo de sentimiento para aplicar BERTopic
+    # Si es menor se usa conteo de frecuencias de palabras como fallback
+    min_docs: 50
+    # Método de clustering interno: 'hdbscan' (clusters naturales) o 'kmeans' (k fijo)
+    metodo: "hdbscan"
+    # Número objetivo de tópicos (kmeans: fijo; hdbscan: reduce si encuentra más; 0=sin reducción)
+    nr_topics: 5
+    # Top-N comentarios más similares al concepto 'precio / valor / costo'
+    precio_valor_costo_top_n: 5
+    # HDBSCAN min_cluster_size = max(floor, n // factor) — controla granularidad de tópicos
+    min_cluster_size_floor: 30
+    min_cluster_size_factor: 200
+    # UMAP 2D para scatter de sentimientos (distinto del UMAP interno de BERTopic)
+    umap2d:
+      max_neighbors: 50      # límite máximo de vecinos
+      neighbors_factor: 200  # divisor para calcular n_neighbors = min(max, n // factor)
+      min_dist: 0.1
+      metric: "euclidean"
