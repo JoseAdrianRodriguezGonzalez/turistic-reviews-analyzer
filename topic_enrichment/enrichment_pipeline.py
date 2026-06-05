@@ -205,7 +205,7 @@ def _enriquecer_modelo(
         min_freq=Params.MIN_FREQ_VOCAB,
     )
     df_keywords = keywords_to_dataframe(keywords_por_cluster)
-
+    print(df_keywords)
     logger.info('[%s | %s] Identificando documentos representativos...', nombre_fuente, nombre_modelo)
     if X is not None:
         docs_por_cluster = get_representative_docs(
@@ -243,7 +243,7 @@ def _enriquecer_modelo(
             nombre_fuente, nombre_modelo
         )
         df_jerarquia = pd.DataFrame()
-
+    print("AQUIIIII DEBE DE CREAR")
     _exportar_resultados_fuente(
         dir_salida, df_keywords, df_docs, df_jerarquia, nombre_modelo
     )
