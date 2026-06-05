@@ -49,40 +49,10 @@ from topic_enrichment.representative_docs import (
     representative_docs_to_dataframe,
 )
 from topic_enrichment.topic_hierarchy import build_full_hierarchy
-from topic_enrichment.topic_naming import name_all_clusters
+from config import Params, Paths
 
 logger = logging.getLogger(__name__)
 
-
-# ======================================================
-# RUTAS
-# ======================================================
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / 'data'
-
-# Fuentes producidas por el bloque 6
-DIR_CLUSTERING = DATA_DIR / 'clustering'
-
-# Corpus limpio — se usa en todos los enriquecimientos
-PATH_CLEAN_CSV = DATA_DIR / 'translations' / 'normalized_spanish.csv'
-COLUMNA_TEXTO  = 'comentario_clean'
-
-# Salida del bloque 7
-DIR_ENRICHMENT = DATA_DIR / 'topic_enrichment'
-
-# Fuentes disponibles — mismo orden que en clustering_pipeline.py
-FUENTES_DISPONIBLES = [ 'features', 'tfidf', 'yake']
-
-# Hiperparámetros del enrichment
-TOP_N_KEYWORDS = 15   # keywords a extraer por cluster
-TOP_K_DOCS     = 5    # documentos representativos por cluster
-MIN_FREQ_VOCAB = 2    # frecuencia mínima para incluir un término en el vocabulario
-
-
-# ======================================================
-# CARGA DE DATOS
-# ======================================================
 
 def _cargar_corpus(path: Path) -> list[str]:
     '''
@@ -90,7 +60,7 @@ def _cargar_corpus(path: Path) -> list[str]:
     Documentos nulos o vacíos se reemplazan con cadena vacía.
     '''
     df = pd.read_csv(path)
-    textos = df[COLUMNA_TEXTO].fillna('').astype(str).tolist()
+    textos = df[Params.COLUMNA_TEXTO].fillna('').astype(str).tolist()
     logger.info('Corpus cargado: %d documentos desde %s', len(textos), path)
     return textos
 
@@ -102,7 +72,7 @@ def _cargar_etiquetas_fuente(dir_fuente: Path) -> dict[str, list[int]] | None:
 
     El JSON contiene {clave_modelo: [etiquetas por documento]}.
     '''
-    path_etiq = dir_fuente / 'etiquetas_mejores.json'
+    path_etiq = dir_fuente / Paths.CLUSTERING_ETIQUETAS_FILE
 
     if not path_etiq.exists():
         logger.warning('etiquetas_mejores.json no encontrado en %s', dir_fuente)
@@ -124,7 +94,7 @@ def _cargar_proyeccion_2d(dir_fuente: Path) -> np.ndarray | None:
     Se usa como espacio vectorial para calcular centroides y similitudes.
     Retorna None si el archivo no existe.
     '''
-    path_npy = dir_fuente / 'proyeccion_2d.npy'
+    path_npy = dir_fuente / Paths.CLUSTERING_PROYECCION_FILE
 
     if not path_npy.exists():
         logger.warning(
@@ -138,10 +108,6 @@ def _cargar_proyeccion_2d(dir_fuente: Path) -> np.ndarray | None:
     logger.info('Proyección 2D cargada: shape=%s desde %s', X.shape, path_npy)
     return X
 
-
-# ======================================================
-# EXPORTACIÓN
-# ======================================================
 
 def _exportar_resultados_fuente(
     dir_salida: Path,
@@ -187,8 +153,8 @@ def _exportar_resumen_global(
         logger.warning('Sin datos para exportar el resumen global de enrichment')
         return
 
-    DIR_ENRICHMENT.mkdir(parents=True, exist_ok=True)
-    path_resumen = DIR_ENRICHMENT / 'resumen_enrichment.csv'
+    Paths.ENRICHMENT_DIR.mkdir(parents=True, exist_ok=True)
+    path_resumen = Paths.ENRICHMENT_RESUMEN_CSV
 
     df_resumen = pd.DataFrame(filas_resumen)
     df_resumen.to_csv(path_resumen, index=False, encoding='utf-8-sig')
@@ -198,10 +164,6 @@ def _exportar_resumen_global(
         len(df_resumen), path_resumen
     )
 
-
-# ======================================================
-# ENRICHMENT POR FUENTE Y MODELO
-# ======================================================
 
 def _enriquecer_modelo(
     nombre_fuente: str,
@@ -235,24 +197,22 @@ def _enriquecer_modelo(
         nombre_fuente, nombre_modelo, n_clusters, len(labels)
     )
 
-    # --- Paso 1: Top keywords por cluster ---
     logger.info('[%s | %s] Extrayendo keywords...', nombre_fuente, nombre_modelo)
     keywords_por_cluster = extract_top_keywords(
         corpus=corpus,
         labels=labels_array,
-        top_n=TOP_N_KEYWORDS,
-        min_freq=MIN_FREQ_VOCAB,
+        top_n=Params.TOP_N_KEYWORDS,
+        min_freq=Params.MIN_FREQ_VOCAB,
     )
     df_keywords = keywords_to_dataframe(keywords_por_cluster)
-
-    # --- Paso 2: Documentos representativos ---
+    print(df_keywords)
     logger.info('[%s | %s] Identificando documentos representativos...', nombre_fuente, nombre_modelo)
     if X is not None:
         docs_por_cluster = get_representative_docs(
             X=X,
             labels=labels_array,
             corpus=corpus,
-            top_k=TOP_K_DOCS,
+            top_k=Params.TOP_K_DOCS_REPR,
         )
         df_docs = representative_docs_to_dataframe(docs_por_cluster)
     else:
@@ -262,21 +222,15 @@ def _enriquecer_modelo(
         )
         df_docs = pd.DataFrame()
 
-    # --- Paso 3: Topic naming --- PENDIENTE
-    # Cuando topic_naming.py esté implementado, se activará aquí:
-    topic_names = name_all_clusters(keywords_por_cluster, docs_por_cluster if X is not None else {})
-    with open(dir_salida / "topic_names.json", "w", encoding="utf-8") as f:
-        json.dump(topic_names, f, ensure_ascii=False, indent=4)
     logger.info(
-        '[%s | %s] Topic naming pendiente de implementación — omitido',
+        '[%s | %s] Topic naming omitido — llama_cpp no instalado',
         nombre_fuente, nombre_modelo
     )
 
-    # --- Paso 4: Jerarquía ---
     logger.info('[%s | %s] Extrayendo jerarquía...', nombre_fuente, nombre_modelo)
     if X is not None and n_clusters >= 2:
         try:
-            _, df_jerarquia = build_full_hierarchy(X, labels_array, method='ward')
+            _, df_jerarquia = build_full_hierarchy(X, labels_array)
         except Exception as error:
             logger.warning(
                 '[%s | %s] Error al construir jerarquía: %s — omitida',
@@ -289,13 +243,11 @@ def _enriquecer_modelo(
             nombre_fuente, nombre_modelo
         )
         df_jerarquia = pd.DataFrame()
-
-    # --- Exportar resultados ---
+    print("AQUIIIII DEBE DE CREAR")
     _exportar_resultados_fuente(
         dir_salida, df_keywords, df_docs, df_jerarquia, nombre_modelo
     )
 
-    # --- Acumular resumen ---
     for cluster_id in cluster_ids_validos:
         n_docs_cluster = int((labels_array == cluster_id).sum())
         top_keyword = (
@@ -324,7 +276,7 @@ def _enriquecer_fuente(
     Carga etiquetas y proyección 2D, luego llama a _enriquecer_modelo
     para cada modelo disponible.
     '''
-    dir_fuente = DIR_CLUSTERING / nombre_fuente
+    dir_fuente = Paths.CLUSTERING_DIR / nombre_fuente
 
     if not dir_fuente.exists():
         logger.info('Subcarpeta %s no existe — fuente omitida', dir_fuente)
@@ -336,7 +288,7 @@ def _enriquecer_fuente(
 
     X = _cargar_proyeccion_2d(dir_fuente)
 
-    dir_salida = DIR_ENRICHMENT / nombre_fuente
+    dir_salida = Paths.ENRICHMENT_DIR / nombre_fuente
     dir_salida.mkdir(parents=True, exist_ok=True)
 
     for nombre_modelo, labels in etiquetas_por_modelo.items():
@@ -363,10 +315,6 @@ def _enriquecer_fuente(
     logger.info('Fuente %s completada', nombre_fuente)
 
 
-# ======================================================
-# PIPELINE PRINCIPAL
-# ======================================================
-
 def run_enrichment_pipeline(
     fuentes: list[str] | None = None,
 ) -> None:
@@ -381,19 +329,19 @@ def run_enrichment_pipeline(
         fuentes -- lista de fuentes a procesar; si es None se procesan
                    todas las disponibles (embeddings, features, tfidf, yake)
     '''
-    fuentes_a_procesar = fuentes if fuentes is not None else FUENTES_DISPONIBLES
+    fuentes_a_procesar = fuentes if fuentes is not None else Params.ENRICHMENT_FUENTES
 
     logger.info('Iniciando pipeline de topic enrichment')
     logger.info('Fuentes a procesar: %s', fuentes_a_procesar)
 
     # Cargar corpus una sola vez — se reutiliza para todas las fuentes
-    if not PATH_CLEAN_CSV.exists():
+    if not Paths.NORMALIZED_SPANISH_CSV.exists():
         logger.error(
-            'Corpus no encontrado en %s — pipeline abortado', PATH_CLEAN_CSV
+            'Corpus no encontrado en %s — pipeline abortado', Paths.NORMALIZED_SPANISH_CSV
         )
         return
 
-    corpus = _cargar_corpus(PATH_CLEAN_CSV)
+    corpus = _cargar_corpus(Paths.NORMALIZED_SPANISH_CSV)
 
     # Lista acumuladora para el resumen global
     filas_resumen: list[dict] = []

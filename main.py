@@ -108,13 +108,15 @@ Paletas accesibles recomendadas (daltonismo): {', '.join(sorted(ACCESSIBLE_PALET
 Idiomas soportados: {', '.join(sorted(SUPPORTED_LANGUAGES))}
 
 Ejemplos:
-  python main.py                                 # ejecutar todo
-  python main.py --steps preprocessing           # solo preprocesamiento
-  python main.py --steps clustering analysis     # clustering y análisis
-  python main.py --force                         # re-ejecutar todo
-  python main.py --steps clustering --force      # re-ejecutar solo clustering
-  python main.py --status                        # ver estado del pipeline
-  python main.py --list                          # ver steps disponibles
+  python main.py                                           # ejecutar todo
+  python main.py --steps preprocessing                     # solo preprocesamiento
+  python main.py --steps clustering analysis               # clustering y análisis
+  python main.py --force                                   # re-ejecutar todo
+  python main.py --steps analysis --sentiment-metodo robusto      # análisis con método robusto
+  python main.py --steps analysis --sentiment-idioma multi         # modelo multilingüe
+  python main.py --steps analysis --sentiment-features embeddings tfidf  # combinar features
+  python main.py --status                                  # ver estado del pipeline
+  python main.py --list                                    # ver steps disponibles
         """,
     )
 
@@ -194,6 +196,77 @@ Ejemplos:
         "--list",
         action="store_true",
         help="Listar los steps disponibles y salir.",
+    )
+
+    parser.add_argument(
+        "--sentiment-idioma",
+        dest="sentiment_idioma",
+        choices=["es", "multi"],
+        default=None,
+        help=(
+            "Modelo de sentimiento a usar: 'es' (pysentimiento/robertuito, español) "
+            "o 'multi' (cardiffnlp/twitter-xlm-roberta, multilingüe). "
+            "Default: es"
+        ),
+    )
+
+    parser.add_argument(
+        "--sentiment-metodo",
+        dest="sentiment_metodo",
+        choices=["rapido", "robusto"],
+        default=None,
+        help=(
+            "Método de clasificación: 'rapido' (solo transformer) o "
+            "'robusto' (transformer + clasificador supervisado sobre features). "
+            "Default: rapido"
+        ),
+    )
+
+    parser.add_argument(
+        "--sentiment-texto",
+        dest="sentiment_texto",
+        choices=["original", "cleaned"],
+        default=None,
+        help=(
+            "Texto que se pasa al transformer: 'original' (recomendado, "
+            "conserva palabras de sentimiento) o 'cleaned' (lematizado). "
+            "Default: original"
+        ),
+    )
+
+    parser.add_argument(
+        "--sentiment-features",
+        dest="sentiment_features",
+        nargs="+",
+        choices=["embeddings", "tfidf", "yake"],
+        default=None,
+        help=(
+            "Features para el método robusto. Se pueden combinar: "
+            "--sentiment-features embeddings tfidf yake. "
+            "Default: embeddings"
+        ),
+    )
+
+    parser.add_argument(
+        "--mode",
+        dest="mode",
+        choices=["automatic"],
+        default="automatic",
+        help=(
+            "Modo de ejecución. 'automatic' (default): lee pipeline_config.yaml "
+            "y sobreescribe los parámetros del pipeline antes de ejecutar."
+        ),
+    )
+
+    parser.add_argument(
+        "--config-file",
+        dest="config_file",
+        default="pipeline_config.yaml",
+        metavar="PATH",
+        help=(
+            "Ruta al archivo YAML de configuración (solo aplica con --mode automatic). "
+            "Default: pipeline_config.yaml"
+        ),
     )
 
     return parser
@@ -347,6 +420,11 @@ def main() -> None:
 
     parser = construir_parser()
     args   = parser.parse_args()
+
+    # Modo automático: cargar YAML antes de inyectar args del CLI
+    if args.mode == 'automatic':
+        logger.info("Modo automático — cargando configuración desde: %s", args.config_file)
+        Params.load_from_yaml(args.config_file)
 
     # Inyectar parámetros de usuario en Params (issue #1)
     Params.set_from_args(args)
