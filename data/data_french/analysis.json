@@ -1,35 +1,61 @@
 [
     {
-        "indice": 1881,
+        "indice": 579,
         "estrellas": NaN,
-        "comentario": "super fun felt safe fun get resort hours statues beautiful",
+        "comentario": "corazón zona romántica playa ofrece diversidad familias un extremo comunidad extremo sur",
         "pos_tags": [
-            "VERB",
-            "VERB",
-            "NOUN",
-            "PROPN",
             "NOUN",
             "ADJ",
-            "VERB",
-            "ADV",
             "ADJ",
-            "NOUN"
+            "NOUN",
+            "VERB",
+            "ADJ",
+            "ADJ",
+            "DET",
+            "NOUN",
+            "VERB",
+            "VERB",
+            "ADP"
         ],
         "noun_phrases": [
-            "felt",
-            "fun"
+            "corazón zona",
+            "un extremo"
         ],
         "entities": [
             {
-                "text": "super fun felt",
+                "text": "ofrece",
                 "label": "MISC"
-            },
+            }
+        ],
+        "entity_density": 0.08333333333333333
+    },
+    {
+        "indice": 784,
+        "estrellas": NaN,
+        "comentario": "playa local chiringuitos del lado sur mucha gente viendo música",
+        "pos_tags": [
+            "NOUN",
+            "ADJ",
+            "NOUN",
+            "ADJ",
+            "PROPN",
+            "ADP",
+            "NOUN",
+            "ADJ",
+            "NOUN",
+            "PROPN"
+        ],
+        "noun_phrases": [
+            "playa local",
+            "mucha gente"
+        ],
+        "entities": [
             {
-                "text": "get resort",
+                "text": "del lado",
                 "label": "PER"
             }
         ],
-        "entity_density": 0.2
+        "entity_density": 0.1
     },
     {
         "indice": 1904,
@@ -53,38 +79,6 @@
         ],
         "entities": [],
         "entity_density": 0.0
-    },
-    {
-        "indice": 2453,
-        "estrellas": NaN,
-        "comentario": "super fun felt safe fun get resort hours statues beautiful",
-        "pos_tags": [
-            "VERB",
-            "VERB",
-            "NOUN",
-            "PROPN",
-            "NOUN",
-            "ADJ",
-            "VERB",
-            "ADV",
-            "ADJ",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "felt",
-            "fun"
-        ],
-        "entities": [
-            {
-                "text": "super fun felt",
-                "label": "MISC"
-            },
-            {
-                "text": "get resort",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.2
     },
     {
         "indice": 2476,
@@ -133,27 +127,6 @@
         "entity_density": 0.2
     },
     {
-        "indice": 5191,
-        "estrellas": NaN,
-        "comentario": "experience excellent unforgettable professional much fun recommend trying",
-        "pos_tags": [
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "AUX",
-            "VERB",
-            "PROPN"
-        ],
-        "noun_phrases": [
-            "experience excellent unforgettable professional much fun",
-            "trying"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
         "indice": 5385,
         "estrellas": NaN,
         "comentario": "richie amazing super fun made sure got line enjoyed come visit beautiful tour energy",
@@ -185,27 +158,6 @@
             }
         ],
         "entity_density": 0.07142857142857142
-    },
-    {
-        "indice": 5729,
-        "estrellas": NaN,
-        "comentario": "experience excellent unforgettable professional much fun recommend trying",
-        "pos_tags": [
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "AUX",
-            "VERB",
-            "PROPN"
-        ],
-        "noun_phrases": [
-            "experience excellent unforgettable professional much fun",
-            "trying"
-        ],
-        "entities": [],
-        "entity_density": 0.0
     },
     {
         "indice": 5827,
@@ -260,6 +212,29 @@
         "entity_density": 0.0
     },
     {
+        "indice": 5862,
+        "estrellas": NaN,
+        "comentario": "experienced guides excellent treatment sure rich food excellent service recommended",
+        "pos_tags": [
+            "NOUN",
+            "VERB",
+            "ADJ",
+            "ADV",
+            "ADJ",
+            "VERB",
+            "ADJ",
+            "ADJ",
+            "NOUN",
+            "ADJ"
+        ],
+        "noun_phrases": [
+            "experienced",
+            "guides excellent treatment sure rich food excellent service recommended"
+        ],
+        "entities": [],
+        "entity_density": 0.0
+    },
+    {
         "indice": 5873,
         "estrellas": NaN,
         "comentario": "unforgettable experience service hope return soon richie drake pollo temo excellent guides",
@@ -305,6 +280,31 @@
         ],
         "noun_phrases": [
             "excellent experience"
+        ],
+        "entities": [],
+        "entity_density": 0.0
+    },
+    {
+        "indice": 5916,
+        "estrellas": NaN,
+        "comentario": "excellent experience richie super patient friendly fun guides us way made fun",
+        "pos_tags": [
+            "ADJ",
+            "NOUN",
+            "ADJ",
+            "VERB",
+            "NOUN",
+            "ADJ",
+            "DET",
+            "VERB",
+            "DET",
+            "ADP",
+            "NOUN",
+            "ADJ"
+        ],
+        "noun_phrases": [
+            "excellent experience",
+            "patient friendly"
         ],
         "entities": [],
         "entity_density": 0.0
@@ -395,6 +395,29 @@
         "entity_density": 0.0
     },
     {
+        "indice": 6198,
+        "estrellas": NaN,
+        "comentario": "experienced guides excellent treatment sure rich food excellent service recommended",
+        "pos_tags": [
+            "NOUN",
+            "VERB",
+            "ADJ",
+            "ADV",
+            "ADJ",
+            "VERB",
+            "ADJ",
+            "ADJ",
+            "NOUN",
+            "ADJ"
+        ],
+        "noun_phrases": [
+            "experienced",
+            "guides excellent treatment sure rich food excellent service recommended"
+        ],
+        "entities": [],
+        "entity_density": 0.0
+    },
+    {
         "indice": 6209,
         "estrellas": NaN,
         "comentario": "unforgettable experience service hope return soon richie drake pollo temo excellent guides",
@@ -445,48 +468,135 @@
         "entity_density": 0.0
     },
     {
-        "indice": 7413,
+        "indice": 6247,
         "estrellas": NaN,
-        "comentario": "unique beautiful place go mezcal everyone chocolate pairings",
+        "comentario": "excellent experience richie super patient friendly fun guides us way made fun",
         "pos_tags": [
             "ADJ",
             "NOUN",
+            "ADJ",
+            "VERB",
             "NOUN",
+            "ADJ",
+            "DET",
+            "VERB",
+            "DET",
             "ADP",
             "NOUN",
-            "VERB",
-            "ADJ",
             "ADJ"
         ],
         "noun_phrases": [
-            "unique beautiful place",
-            "go mezcal"
+            "excellent experience",
+            "patient friendly"
         ],
         "entities": [],
         "entity_density": 0.0
     },
     {
-        "indice": 7590,
+        "indice": 6528,
         "estrellas": NaN,
-        "comentario": "place beautiful distillery tour excellent see agave taste best",
+        "comentario": "ir norte sur autobús limpiador agua playa comida deportes acuáticos genial",
+        "pos_tags": [
+            "PRON",
+            "VERB",
+            "ADP",
+            "NOUN",
+            "DET",
+            "NOUN",
+            "VERB",
+            "ADV",
+            "ADV",
+            "ADJ",
+            "ADJ"
+        ],
+        "noun_phrases": [
+            "autobús",
+            "limpiador agua playa"
+        ],
+        "entities": [],
+        "entity_density": 0.0
+    },
+    {
+        "indice": 6671,
+        "estrellas": NaN,
+        "comentario": "más ver la bahía entera viejo nuevo sur norte espectacular",
         "pos_tags": [
             "NOUN",
-            "ADJ",
-            "ADJ",
+            "VERB",
+            "DET",
             "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
+            "VERB",
+            "VERB",
+            "VERB",
+            "ADP",
             "ADJ",
             "NOUN"
         ],
         "noun_phrases": [
-            "place beautiful",
-            "tour excellent",
-            "best"
+            "más",
+            "la bahía",
+            "norte espectacular"
+        ],
+        "entities": [
+            {
+                "text": "más",
+                "label": "MISC"
+            }
+        ],
+        "entity_density": 0.1
+    },
+    {
+        "indice": 7001,
+        "estrellas": NaN,
+        "comentario": "ir norte sur autobús limpiador agua playa comida deportes acuáticos genial",
+        "pos_tags": [
+            "PRON",
+            "VERB",
+            "ADP",
+            "NOUN",
+            "DET",
+            "NOUN",
+            "VERB",
+            "ADV",
+            "ADV",
+            "ADJ",
+            "ADJ"
+        ],
+        "noun_phrases": [
+            "autobús",
+            "limpiador agua playa"
         ],
         "entities": [],
         "entity_density": 0.0
+    },
+    {
+        "indice": 7144,
+        "estrellas": NaN,
+        "comentario": "más ver la bahía entera viejo nuevo sur norte espectacular",
+        "pos_tags": [
+            "NOUN",
+            "VERB",
+            "DET",
+            "NOUN",
+            "VERB",
+            "VERB",
+            "VERB",
+            "ADP",
+            "ADJ",
+            "NOUN"
+        ],
+        "noun_phrases": [
+            "más",
+            "la bahía",
+            "norte espectacular"
+        ],
+        "entities": [
+            {
+                "text": "más",
+                "label": "MISC"
+            }
+        ],
+        "entity_density": 0.1
     },
     {
         "indice": 8143,
@@ -505,67 +615,6 @@
         ],
         "entities": [],
         "entity_density": 0.0
-    },
-    {
-        "indice": 8232,
-        "estrellas": NaN,
-        "comentario": "ones sand sculptures human statues see sculpture tours recommended chance next visit",
-        "pos_tags": [
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "VERB",
-            "ADJ",
-            "ADJ",
-            "PRON",
-            "ADJ",
-            "VERB",
-            "NOUN",
-            "ADJ",
-            "ADV"
-        ],
-        "noun_phrases": [
-            "sculpture tours"
-        ],
-        "entities": [
-            {
-                "text": "ones sand",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.08333333333333333
-    },
-    {
-        "indice": 8258,
-        "estrellas": NaN,
-        "comentario": "super fun felt safe fun get resort hours statues beautiful",
-        "pos_tags": [
-            "VERB",
-            "VERB",
-            "NOUN",
-            "PROPN",
-            "NOUN",
-            "ADJ",
-            "VERB",
-            "ADV",
-            "ADJ",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "felt",
-            "fun"
-        ],
-        "entities": [
-            {
-                "text": "super fun felt",
-                "label": "MISC"
-            },
-            {
-                "text": "get resort",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.2
     },
     {
         "indice": 8281,
@@ -591,43 +640,6 @@
         "entity_density": 0.0
     },
     {
-        "indice": 9406,
-        "estrellas": NaN,
-        "comentario": "fun place stop quick drink take pretty quite expensive far food souvenirs",
-        "pos_tags": [
-            "ADJ",
-            "NOUN",
-            "X",
-            "ADJ",
-            "NOUN",
-            "X",
-            "NOUN",
-            "ADV",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "fun place"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 9522,
-        "estrellas": NaN,
-        "comentario": "went times quiet",
-        "pos_tags": [
-            "VERB",
-            "ADJ",
-            "SCONJ"
-        ],
-        "noun_phrases": [],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
         "indice": 9675,
         "estrellas": NaN,
         "comentario": "place able see",
@@ -643,70 +655,19 @@
         "entity_density": 0.0
     },
     {
-        "indice": 9906,
+        "indice": 12379,
         "estrellas": NaN,
-        "comentario": "beautiful place swim dirty restaurants beautiful",
+        "comentario": "place beautiful place",
         "pos_tags": [
             "NOUN",
-            "NOUN",
             "ADJ",
-            "ADJ",
-            "NOUN",
-            "VERB"
+            "NOUN"
         ],
         "noun_phrases": [
-            "beautiful place swim",
-            "restaurants beautiful"
+            "place beautiful"
         ],
         "entities": [],
         "entity_density": 0.0
-    },
-    {
-        "indice": 12382,
-        "estrellas": NaN,
-        "comentario": "beautiful place palapas get",
-        "pos_tags": [
-            "NOUN",
-            "NOUN",
-            "ADV",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "beautiful place"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 12821,
-        "estrellas": NaN,
-        "comentario": "little tour guides provide good pups get little playful nip",
-        "pos_tags": [
-            "AUX",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "AUX",
-            "ADJ",
-            "X"
-        ],
-        "noun_phrases": [
-            "little tour guides"
-        ],
-        "entities": [
-            {
-                "text": "little tour guides provide",
-                "label": "MISC"
-            },
-            {
-                "text": "get little playful",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.2
     },
     {
         "indice": 12979,
@@ -728,59 +689,35 @@
         "entity_density": 0.0
     },
     {
-        "indice": 13047,
+        "indice": 13098,
         "estrellas": NaN,
-        "comentario": "scuba diving lions lifetime experience get try",
+        "comentario": "amigable curioso leones baja visibilidad agradable temperatura suficiente vida mirar submarino amor punta sur",
         "pos_tags": [
             "ADJ",
+            "PRON",
+            "ADJ",
+            "PRON",
+            "VERB",
+            "ADJ",
+            "VERB",
             "ADJ",
             "NOUN",
             "ADJ",
-            "NOUN",
             "ADJ",
-            "ADV"
+            "VERB",
+            "VERB",
+            "ADP"
         ],
         "noun_phrases": [
-            "diving lions lifetime"
+            "curioso leones"
         ],
         "entities": [
             {
-                "text": "scuba diving",
+                "text": "mirar submarino",
                 "label": "PER"
             }
         ],
-        "entity_density": 0.14285714285714285
-    },
-    {
-        "indice": 13664,
-        "estrellas": NaN,
-        "comentario": "little tour guides provide good pups get little playful nip",
-        "pos_tags": [
-            "AUX",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "AUX",
-            "ADJ",
-            "X"
-        ],
-        "noun_phrases": [
-            "little tour guides"
-        ],
-        "entities": [
-            {
-                "text": "little tour guides provide",
-                "label": "MISC"
-            },
-            {
-                "text": "get little playful",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.2
+        "entity_density": 0.07142857142857142
     },
     {
         "indice": 13822,
@@ -802,28 +739,35 @@
         "entity_density": 0.0
     },
     {
-        "indice": 13890,
+        "indice": 13941,
         "estrellas": NaN,
-        "comentario": "scuba diving lions lifetime experience get try",
+        "comentario": "amigable curioso leones baja visibilidad agradable temperatura suficiente vida mirar submarino amor punta sur",
         "pos_tags": [
             "ADJ",
+            "PRON",
+            "ADJ",
+            "PRON",
+            "VERB",
+            "ADJ",
+            "VERB",
             "ADJ",
             "NOUN",
             "ADJ",
-            "NOUN",
             "ADJ",
-            "ADV"
+            "VERB",
+            "VERB",
+            "ADP"
         ],
         "noun_phrases": [
-            "diving lions lifetime"
+            "curioso leones"
         ],
         "entities": [
             {
-                "text": "scuba diving",
+                "text": "mirar submarino",
                 "label": "PER"
             }
         ],
-        "entity_density": 0.14285714285714285
+        "entity_density": 0.07142857142857142
     },
     {
         "indice": 15652,
@@ -977,58 +921,6 @@
         "entity_density": 0.16666666666666666
     },
     {
-        "indice": 16401,
-        "estrellas": NaN,
-        "comentario": "one beautiful must see across street place sit go",
-        "pos_tags": [
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADV",
-            "ADP"
-        ],
-        "noun_phrases": [
-            "one beautiful",
-            "must",
-            "place"
-        ],
-        "entities": [
-            {
-                "text": "one beautiful must see across street",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.1111111111111111
-    },
-    {
-        "indice": 16606,
-        "estrellas": NaN,
-        "comentario": "quiet beach get great massage blue hour",
-        "pos_tags": [
-            "PRON",
-            "NOUN",
-            "AUX",
-            "NOUN",
-            "ADJ",
-            "VERB",
-            "ADP"
-        ],
-        "noun_phrases": [
-            "quiet beach get great"
-        ],
-        "entities": [
-            {
-                "text": "quiet beach get great massage blue hour",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.14285714285714285
-    },
-    {
         "indice": 18587,
         "estrellas": NaN,
         "comentario": "sell expensive place dirty",
@@ -1124,31 +1016,6 @@
         "entity_density": 0.07692307692307693
     },
     {
-        "indice": 19012,
-        "estrellas": NaN,
-        "comentario": "unique experience need try least lifetime dolphins friendly",
-        "pos_tags": [
-            "ADJ",
-            "NOUN",
-            "VERB",
-            "VERB",
-            "ADV",
-            "ADJ",
-            "ADV",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "unique experience"
-        ],
-        "entities": [
-            {
-                "text": "try least",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.125
-    },
-    {
         "indice": 19541,
         "estrellas": NaN,
         "comentario": "excellent experience time patient spent time dolphins lions",
@@ -1210,101 +1077,6 @@
         "entities": [
             {
                 "text": "park",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.14285714285714285
-    },
-    {
-        "indice": 19735,
-        "estrellas": NaN,
-        "comentario": "excellent experience dolphins lions best animals look happy",
-        "pos_tags": [
-            "ADJ",
-            "NOUN",
-            "ADV",
-            "ADJ",
-            "X",
-            "VERB",
-            "ADJ",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "excellent experience"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 19988,
-        "estrellas": NaN,
-        "comentario": "pictures th avenue alive questions help",
-        "pos_tags": [
-            "NOUN",
-            "PRON",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "pictures",
-            "th avenue alive",
-            "questions help"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 20606,
-        "estrellas": NaN,
-        "comentario": "avenida better times unique beautiful get place must visit ever staying playa carmen",
-        "pos_tags": [
-            "VERB",
-            "VERB",
-            "NOUN",
-            "ADJ",
-            "VERB",
-            "ADJ",
-            "NOUN",
-            "NOUN",
-            "VERB",
-            "VERB",
-            "PROPN",
-            "NOUN",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "times unique",
-            "get place",
-            "must",
-            "playa carmen"
-        ],
-        "entities": [
-            {
-                "text": "must",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.07692307692307693
-    },
-    {
-        "indice": 20710,
-        "estrellas": NaN,
-        "comentario": "mixed tourist souvenirs etc nice restaurants friendly",
-        "pos_tags": [
-            "ADJ",
-            "VERB",
-            "VERB",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "ADJ"
-        ],
-        "noun_phrases": [],
-        "entities": [
-            {
-                "text": "mixed tourist",
                 "label": "PER"
             }
         ],
@@ -1389,6 +1161,30 @@
         "entity_density": 0.05
     },
     {
+        "indice": 22166,
+        "estrellas": NaN,
+        "comentario": "impressive experience dive miss hand dive experience",
+        "pos_tags": [
+            "NOUN",
+            "NOUN",
+            "ADJ",
+            "VERB",
+            "X",
+            "ADJ",
+            "ADJ"
+        ],
+        "noun_phrases": [
+            "impressive experience"
+        ],
+        "entities": [
+            {
+                "text": "miss hand",
+                "label": "ORG"
+            }
+        ],
+        "entity_density": 0.14285714285714285
+    },
+    {
         "indice": 22445,
         "estrellas": NaN,
         "comentario": "bit much get sure else see explore unique natural",
@@ -1450,34 +1246,6 @@
         "entity_density": 0.058823529411764705
     },
     {
-        "indice": 22548,
-        "estrellas": NaN,
-        "comentario": "cenote beautiful place unique water clear little bit entrance fee place little enjoy",
-        "pos_tags": [
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "VERB",
-            "NOUN",
-            "PRON",
-            "PRON",
-            "NOUN",
-            "NOUN",
-            "NOUN",
-            "ADJ",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "cenote beautiful",
-            "clear",
-            "little",
-            "fee place"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
         "indice": 23584,
         "estrellas": NaN,
         "comentario": "far one best experiences guided passionate guide chance explore beautiful cave cavern cenotes lifetime experience absolute must list coming",
@@ -1518,29 +1286,6 @@
         "entity_density": 0.05263157894736842
     },
     {
-        "indice": 23602,
-        "estrellas": NaN,
-        "comentario": "place beautiful guide made day care people group fine experience",
-        "pos_tags": [
-            "NOUN",
-            "ADJ",
-            "VERB",
-            "ADJ",
-            "ADJ",
-            "VERB",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "place beautiful",
-            "group fine experience"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
         "indice": 24302,
         "estrellas": NaN,
         "comentario": "excellent experience attention hope return soon",
@@ -1561,51 +1306,6 @@
         "entity_density": 0.0
     },
     {
-        "indice": 24399,
-        "estrellas": NaN,
-        "comentario": "excellent attention kindness part unforgettable experience",
-        "pos_tags": [
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "excellent attention kindness",
-            "part unforgettable experience"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 24575,
-        "estrellas": NaN,
-        "comentario": "unique animation guys like denisse good waiter service",
-        "pos_tags": [
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "NOUN",
-            "VERB",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "unique animation guys",
-            "service"
-        ],
-        "entities": [
-            {
-                "text": "like denisse good waiter",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.125
-    },
-    {
         "indice": 24606,
         "estrellas": NaN,
         "comentario": "excellent facilities excellent service jlo recommend come",
@@ -1622,73 +1322,6 @@
             "excellent facilities",
             "excellent service",
             "jlo recommend come"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 24644,
-        "estrellas": NaN,
-        "comentario": "excellent unique fun adventure thank making something unique fun thank",
-        "pos_tags": [
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "VERB",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "PRON",
-            "VERB"
-        ],
-        "noun_phrases": [],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 24653,
-        "estrellas": NaN,
-        "comentario": "unique experience adults children much fun love see happy grateful always guys",
-        "pos_tags": [
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADV",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "unique experience adults"
-        ],
-        "entities": [
-            {
-                "text": "children much",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.08333333333333333
-    },
-    {
-        "indice": 30724,
-        "estrellas": NaN,
-        "comentario": "excellent prices excellent friendly professional staff",
-        "pos_tags": [
-            "ADJ",
-            "NOUN",
-            "ADV",
-            "NOUN",
-            "ADJ",
-            "ADP"
-        ],
-        "noun_phrases": [
-            "excellent prices excellent friendly professional"
         ],
         "entities": [],
         "entity_density": 0.0
@@ -1898,31 +1531,6 @@
         "entity_density": 0.03125
     },
     {
-        "indice": 32863,
-        "estrellas": NaN,
-        "comentario": "journee bien paisible baie tangolunda happy sunday",
-        "pos_tags": [
-            "NOUN",
-            "ADV",
-            "ADJ",
-            "NOUN",
-            "ADV",
-            "ADJ",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "journee",
-            "bien paisible baie tangolunda"
-        ],
-        "entities": [
-            {
-                "text": "journee",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.14285714285714285
-    },
-    {
         "indice": 32990,
         "estrellas": NaN,
         "comentario": "poster event beach blue sky tres detaille bfmtv studio cachette made eclairage volumetrique",
@@ -2062,30 +1670,6 @@
         "entity_density": 0.058823529411764705
     },
     {
-        "indice": 34690,
-        "estrellas": NaN,
-        "comentario": "friend trip friends beautifulplaces sunset lapazmexico beautifulpeople",
-        "pos_tags": [
-            "VERB",
-            "VERB",
-            "ADJ",
-            "NOUN",
-            "NOUN",
-            "ADJ",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "friends beautifulplaces sunset"
-        ],
-        "entities": [
-            {
-                "text": "trip friends beautifulplaces",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.14285714285714285
-    },
-    {
         "indice": 34837,
         "estrellas": NaN,
         "comentario": "sexy mode sexycouple sexyboot lapazmx",
@@ -2202,49 +1786,6 @@
             }
         ],
         "entity_density": 0.047619047619047616
-    },
-    {
-        "indice": 35832,
-        "estrellas": NaN,
-        "comentario": "mist cool air sun comes sierra madre mountains san blas nayarit mexico sunrise sanblasnayarit sierramadremountains nayarit tripramblernick",
-        "pos_tags": [
-            "VERB",
-            "ADV",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADV",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "sierra",
-            "tripramblernick"
-        ],
-        "entities": [
-            {
-                "text": "mist cool air",
-                "label": "MISC"
-            },
-            {
-                "text": "sun comes",
-                "label": "ORG"
-            },
-            {
-                "text": "san blas",
-                "label": "LOC"
-            }
-        ],
-        "entity_density": 0.17647058823529413
     },
     {
         "indice": 35997,
@@ -2411,164 +1952,6 @@
             }
         ],
         "entity_density": 0.0761904761904762
-    },
-    {
-        "indice": 36298,
-        "estrellas": NaN,
-        "comentario": "observer tortues akumal privilege turtle elles vivent ici naturellement habitat meritent respecte chez pixan riviera chaque excursion encadree preserver bien etre equilibre cet ecosysteme unique water wave herb akumal mexique excursionfrancophoen tortues pixanriviera",
-        "pos_tags": [
-            "VERB",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "VERB",
-            "PRON",
-            "VERB",
-            "ADV",
-            "ADV",
-            "NOUN",
-            "ADV",
-            "ADJ",
-            "ADP",
-            "NOUN",
-            "VERB",
-            "DET",
-            "NOUN",
-            "X",
-            "VERB",
-            "ADV",
-            "NOUN",
-            "ADJ",
-            "DET",
-            "VERB",
-            "ADJ",
-            "VERB",
-            "AUX",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "VERB"
-        ],
-        "noun_phrases": [
-            "akumal privilege turtle",
-            "elles",
-            "pixan",
-            "chaque excursion encadree",
-            "etre equilibre",
-            "herb"
-        ],
-        "entities": [
-            {
-                "text": "privilege",
-                "label": "MISC"
-            },
-            {
-                "text": "wave herb",
-                "label": "PER"
-            },
-            {
-                "text": "mexique excursionfrancophoen",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.09090909090909091
-    },
-    {
-        "indice": 36419,
-        "estrellas": NaN,
-        "comentario": "avantages travailler nature nombreux chaque journee unique part rencontres inoubliables faisons autre part surprises mere nature reserve hier chance observer magnifique crocodile plein bain soleil ensuite offert double spectacle nageant sous yeux handshake excursions camera with flash benoit famille crocodile mangroves manglar water turquoise agua eauturquoise eau bocapaila siankaan tulum cocodrilo caraibes mexico turismo tourism vacation sun beach tour tourguide yucatan",
-        "pos_tags": [
-            "NOUN",
-            "VERB",
-            "NOUN",
-            "ADJ",
-            "DET",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "VERB",
-            "ADJ",
-            "ADV",
-            "NOUN",
-            "VERB",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "ADV",
-            "VERB",
-            "ADJ",
-            "NOUN",
-            "VERB",
-            "ADP",
-            "NUM",
-            "ADJ",
-            "PRON",
-            "VERB",
-            "ADJ",
-            "VERB",
-            "DET",
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "VERB",
-            "VERB",
-            "NOUN",
-            "VERB",
-            "VERB",
-            "NOUN",
-            "PROPN",
-            "PROPN",
-            "ADV",
-            "ADV",
-            "ADJ",
-            "ADP",
-            "NOUN",
-            "ADJ",
-            "ADJ",
-            "ADJ",
-            "NOUN",
-            "NOUN",
-            "ADJ",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "avantages",
-            "chaque journee unique",
-            "part rencontres",
-            "autre part",
-            "surprises mere",
-            "chance",
-            "crocodile plein",
-            "soleil",
-            "spectacle",
-            "handshake excursions",
-            "benoit famille",
-            "mangroves",
-            "eau bocapaila siankaan",
-            "tulum cocodrilo caraibes mexico turismo"
-        ],
-        "entities": [
-            {
-                "text": "with flash benoit",
-                "label": "PER"
-            },
-            {
-                "text": "sun beach",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.03278688524590164
     },
     {
         "indice": 36423,
@@ -3364,23 +2747,34 @@
         "entity_density": 0.1111111111111111
     },
     {
-        "indice": 40974,
-        "estrellas": 4.0,
-        "comentario": "de toute beaute illuminee en soiree",
+        "indice": 41075,
+        "estrellas": 5.0,
+        "comentario": "bonito lugar bonita iglesia bonita toda la ciudad bonito baja california sur",
         "pos_tags": [
-            "ADP",
+            "PRON",
+            "VERB",
+            "ADV",
+            "ADJ",
+            "ADV",
+            "VERB",
             "DET",
             "NOUN",
-            "ADJ",
+            "NUM",
             "ADP",
-            "PROPN"
+            "ADJ",
+            "ADP"
         ],
         "noun_phrases": [
-            "toute beaute illuminee",
-            "soiree"
+            "bonito",
+            "la ciudad"
         ],
-        "entities": [],
-        "entity_density": 0.0
+        "entities": [
+            {
+                "text": "bonito",
+                "label": "LOC"
+            }
+        ],
+        "entity_density": 0.08333333333333333
     },
     {
         "indice": 41133,
@@ -3912,53 +3306,6 @@
         "entity_density": 0.14285714285714285
     },
     {
-        "indice": 41551,
-        "estrellas": 5.0,
-        "comentario": "Trs jolie coin voir absolument",
-        "pos_tags": [
-            "NOUN",
-            "VERB",
-            "ADV",
-            "VERB",
-            "ADV"
-        ],
-        "noun_phrases": [
-            "Trs"
-        ],
-        "entities": [
-            {
-                "text": "Trs",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.2
-    },
-    {
-        "indice": 41645,
-        "estrellas": 5.0,
-        "comentario": "Magnifique balade, il fait bon y flner",
-        "pos_tags": [
-            "NOUN",
-            "NOUN",
-            "PUNCT",
-            "PRON",
-            "VERB",
-            "ADJ",
-            "PRON",
-            "VERB"
-        ],
-        "noun_phrases": [
-            "Magnifique balade, il fait bon y flner"
-        ],
-        "entities": [
-            {
-                "text": "Magnifique balade",
-                "label": "PER"
-            }
-        ],
-        "entity_density": 0.125
-    },
-    {
         "indice": 41663,
         "estrellas": 5.0,
         "comentario": "Facile pour voyager pas chre",
@@ -4057,58 +3404,34 @@
         "entity_density": 0.0
     },
     {
-        "indice": 42222,
-        "estrellas": 4.0,
-        "comentario": "Lieu de toutes les promenades. Trs vivant au moment d halloween",
+        "indice": 41759,
+        "estrellas": 5.0,
+        "comentario": "Arriba la paz, baja California sur palomilla",
         "pos_tags": [
-            "NOUN",
-            "ADP",
-            "ADJ",
+            "PROPN",
             "DET",
             "NOUN",
             "PUNCT",
-            "ADV",
-            "ADV",
+            "VERB",
+            "PROPN",
             "ADP",
-            "NOUN",
-            "ADP",
-            "ADV"
+            "VERB"
         ],
         "noun_phrases": [
-            "Lieu",
-            "toutes les promenades",
-            "moment"
+            "Arriba",
+            "la paz"
         ],
         "entities": [
             {
-                "text": "Trs",
-                "label": "MISC"
+                "text": "Arriba la paz",
+                "label": "PER"
             },
             {
-                "text": "halloween",
-                "label": "MISC"
+                "text": "California",
+                "label": "LOC"
             }
         ],
-        "entity_density": 0.16666666666666666
-    },
-    {
-        "indice": 42598,
-        "estrellas": 5.0,
-        "comentario": "Just beautiful",
-        "pos_tags": [
-            "NOUN",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "Just"
-        ],
-        "entities": [
-            {
-                "text": "Just beautiful",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.5
+        "entity_density": 0.25
     },
     {
         "indice": 43113,
@@ -4222,50 +3545,35 @@
         "entity_density": 0.09523809523809523
     },
     {
-        "indice": 43314,
-        "estrellas": 4.0,
-        "comentario": "Promenade agréable , beaux couchers de soleil",
+        "indice": 44434,
+        "estrellas": 1.0,
+        "comentario": "No me gustó la remodelación le quitaron mucha calle.",
         "pos_tags": [
+            "PROPN",
+            "PRON",
+            "NOUN",
+            "DET",
+            "NOUN",
+            "DET",
+            "NOUN",
             "NOUN",
             "ADJ",
-            "PUNCT",
-            "ADJ",
-            "ADJ",
-            "ADP",
-            "NOUN"
+            "PUNCT"
         ],
         "noun_phrases": [
-            "Promenade agréable , beaux couchers de soleil"
+            "No",
+            "me gustó",
+            "la remodelación",
+            "le quitaron",
+            "mucha"
         ],
         "entities": [
             {
-                "text": "Promenade agréable",
+                "text": "No me gustó la remodelación",
                 "label": "MISC"
             }
         ],
-        "entity_density": 0.14285714285714285
-    },
-    {
-        "indice": 43628,
-        "estrellas": 5.0,
-        "comentario": "Beautiful. Lost of restaurant",
-        "pos_tags": [
-            "PROPN",
-            "PUNCT",
-            "ADJ",
-            "PRON",
-            "VERB"
-        ],
-        "noun_phrases": [
-            "Beautiful"
-        ],
-        "entities": [
-            {
-                "text": "Beautiful",
-                "label": "LOC"
-            }
-        ],
-        "entity_density": 0.2
+        "entity_density": 0.1
     },
     {
         "indice": 44543,
@@ -4367,24 +3675,6 @@
             "rez",
             "chaussée",
             "au premier étage"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 44739,
-        "estrellas": 5.0,
-        "comentario": "Beautiful course beautiful day",
-        "pos_tags": [
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "ADJ",
-            "PUNCT"
-        ],
-        "noun_phrases": [
-            "Beautiful",
-            "course beautiful day"
         ],
         "entities": [],
         "entity_density": 0.0
@@ -5215,6 +4505,35 @@
         "entity_density": 0.025423728813559324
     },
     {
+        "indice": 46976,
+        "estrellas": 5.0,
+        "comentario": "Hermosa playa, no existe fotografía que le haga honor,",
+        "pos_tags": [
+            "PROPN",
+            "X",
+            "PUNCT",
+            "X",
+            "X",
+            "NOUN",
+            "SCONJ",
+            "DET",
+            "PROPN",
+            "ADJ",
+            "PUNCT"
+        ],
+        "noun_phrases": [
+            "Hermosa playa, no existe",
+            "le haga"
+        ],
+        "entities": [
+            {
+                "text": "haga honor",
+                "label": "ORG"
+            }
+        ],
+        "entity_density": 0.09090909090909091
+    },
+    {
         "indice": 47006,
         "estrellas": 3.0,
         "comentario": "Il est super de limiter un nombre défini le nombre de visiteur par jour en revanche il faudrait que lentrée soit mieux organisée réservation en ligne ou que le trajet pour la queue soit clairement défini car sinon cest lenfer ",
@@ -5304,6 +4623,25 @@
         ],
         "entities": [],
         "entity_density": 0.0
+    },
+    {
+        "indice": 47284,
+        "estrellas": 5.0,
+        "comentario": "Excelentes paisajes",
+        "pos_tags": [
+            "PROPN",
+            "VERB"
+        ],
+        "noun_phrases": [
+            "Excelentes"
+        ],
+        "entities": [
+            {
+                "text": "Excelentes",
+                "label": "MISC"
+            }
+        ],
+        "entity_density": 0.5
     },
     {
         "indice": 47314,
@@ -5614,104 +4952,6 @@
         "entity_density": 0.037037037037037035
     },
     {
-        "indice": 48027,
-        "estrellas": 4.0,
-        "comentario": "Proche du centre mais beaucoup de monde. Trs tassé car plage petite.",
-        "pos_tags": [
-            "ADJ",
-            "ADP",
-            "NOUN",
-            "CCONJ",
-            "ADV",
-            "ADP",
-            "NOUN",
-            "PUNCT",
-            "ADV",
-            "VERB",
-            "CCONJ",
-            "ADV",
-            "ADJ",
-            "PUNCT"
-        ],
-        "noun_phrases": [
-            "centre",
-            "monde"
-        ],
-        "entities": [
-            {
-                "text": "Trs",
-                "label": "MISC"
-            }
-        ],
-        "entity_density": 0.07142857142857142
-    },
-    {
-        "indice": 48399,
-        "estrellas": 5.0,
-        "comentario": "Buen sitio tranquilo",
-        "pos_tags": [
-            "PROPN",
-            "NOUN",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "Buen sitio tranquilo"
-        ],
-        "entities": [
-            {
-                "text": "Buen",
-                "label": "LOC"
-            }
-        ],
-        "entity_density": 0.3333333333333333
-    },
-    {
-        "indice": 48416,
-        "estrellas": 5.0,
-        "comentario": "Me la pasé super bien.",
-        "pos_tags": [
-            "NOUN",
-            "DET",
-            "VERB",
-            "VERB",
-            "ADV",
-            "PUNCT"
-        ],
-        "noun_phrases": [
-            "Me"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 48474,
-        "estrellas": 5.0,
-        "comentario": "tres belle plage que nous avons decouverte lors dune excursion en bateau",
-        "pos_tags": [
-            "NOUN",
-            "ADJ",
-            "NOUN",
-            "PRON",
-            "PRON",
-            "AUX",
-            "VERB",
-            "ADV",
-            "ADJ",
-            "NOUN",
-            "ADP",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "tres belle plage",
-            "que",
-            "nous",
-            "excursion",
-            "bateau"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
         "indice": 48535,
         "estrellas": 5.0,
         "comentario": "cest paradisiac sans compter quon voit des tortues partout",
@@ -5732,44 +4972,6 @@
         ],
         "entities": [],
         "entity_density": 0.0
-    },
-    {
-        "indice": 48547,
-        "estrellas": 5.0,
-        "comentario": "es un paraiso con playas virgenes",
-        "pos_tags": [
-            "ADP",
-            "DET",
-            "NOUN",
-            "NOUN",
-            "NOUN",
-            "ADJ"
-        ],
-        "noun_phrases": [
-            "un paraiso"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
-        "indice": 48548,
-        "estrellas": 5.0,
-        "comentario": "magnifique a faire sans hesiter",
-        "pos_tags": [
-            "ADJ",
-            "AUX",
-            "VERB",
-            "ADP",
-            "VERB"
-        ],
-        "noun_phrases": [],
-        "entities": [
-            {
-                "text": "magnifique",
-                "label": "LOC"
-            }
-        ],
-        "entity_density": 0.2
     },
     {
         "indice": 48587,
@@ -6015,35 +5217,6 @@
         "entity_density": 0.0
     },
     {
-        "indice": 49135,
-        "estrellas": 3.0,
-        "comentario": "dommage que cela soit en espagnol uniquement. langlais maurait aidé mieux comprendre",
-        "pos_tags": [
-            "NOUN",
-            "SCONJ",
-            "PRON",
-            "AUX",
-            "ADP",
-            "VERB",
-            "ADV",
-            "PUNCT",
-            "DET",
-            "NOUN",
-            "PRON",
-            "AUX",
-            "VERB",
-            "ADV",
-            "VERB"
-        ],
-        "noun_phrases": [
-            "dommage",
-            "cela",
-            "m'"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
         "indice": 49220,
         "estrellas": 5.0,
         "comentario": "petit musée trs intéressant sur lhistoire de baja california sur",
@@ -6128,25 +5301,6 @@
         "entity_density": 0.0
     },
     {
-        "indice": 49441,
-        "estrellas": 4.0,
-        "comentario": "obligation de connaitre lespagnol",
-        "pos_tags": [
-            "NOUN",
-            "ADP",
-            "NOUN",
-            "DET",
-            "NOUN"
-        ],
-        "noun_phrases": [
-            "obligation",
-            "connaitre",
-            "l'espagnol"
-        ],
-        "entities": [],
-        "entity_density": 0.0
-    },
-    {
         "indice": 50943,
         "estrellas": 5.0,
         "comentario": "Vraiment une belle plage",
@@ -6159,5 +5313,80 @@
         "noun_phrases": [],
         "entities": [],
         "entity_density": 0.0
+    },
+    {
+        "indice": 53787,
+        "estrellas": 5.0,
+        "comentario": "vista lugar s p c t c u l r vale pena temazcal tirolesa puedes dejar hacer visita temazcal ponen mezcla aromas impregnan forma deliciosa disfruta muchisimo tirolesa vista increible azul tan intenso mar caribe zona precisamente junto punta sur",
+        "pos_tags": [
+            "NUM",
+            "VERB",
+            "PRON",
+            "NOUN",
+            "NOUN",
+            "NOUN",
+            "NOUN",
+            "ADP",
+            "DET",
+            "NOUN",
+            "ADJ",
+            "VERB",
+            "ADV",
+            "VERB",
+            "NOUN",
+            "VERB",
+            "ADJ",
+            "AUX",
+            "ADV",
+            "ADJ",
+            "NOUN",
+            "PROPN",
+            "ADJ",
+            "ADJ",
+            "NOUN",
+            "ADJ",
+            "NOUN",
+            "VERB",
+            "PROPN",
+            "ADJ",
+            "ADJ",
+            "DET",
+            "NOUN",
+            "ADJ",
+            "VERB",
+            "ADJ",
+            "ADJ",
+            "NOUN",
+            "VERB",
+            "ADP"
+        ],
+        "noun_phrases": [
+            "p c t c u l",
+            "puedes",
+            "deliciosa",
+            "muchisimo",
+            "vista increible",
+            "tan intenso mar",
+            "junto"
+        ],
+        "entities": [
+            {
+                "text": "vista lugar",
+                "label": "MISC"
+            },
+            {
+                "text": "p c t c",
+                "label": "MISC"
+            },
+            {
+                "text": "dejar hacer",
+                "label": "MISC"
+            },
+            {
+                "text": "deliciosa disfruta muchisimo tirolesa",
+                "label": "MISC"
+            }
+        ],
+        "entity_density": 0.1
     }
 ]

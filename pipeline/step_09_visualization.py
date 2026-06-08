@@ -59,12 +59,12 @@ class StepVisualization(BaseStep):
         return [
             Paths.CLUSTERING_EMBEDDINGS_DIR / Paths.CLUSTERING_PROYECCION_FILE,
             Paths.ENRICHMENT_KEYWORDS_CSV,
-            Paths.SENTIMIENTO_POR_DESTINO_CSV,
-            Paths.SENTIMIENTO_POR_TOPICO_CSV,
-            Paths.TENDENCIAS_TOPICOS_DESTINO_CSV,
-            Paths.ENTIDADES_POR_DESTINO_CSV,
+            #Paths.SENTIMIENTO_POR_DESTINO_CSV,
+          #  Paths.SENTIMIENTO_POR_TOPICO_CSV,
+          #  Paths.TENDENCIAS_TOPICOS_DESTINO_CSV,
+          #  Paths.ENTIDADES_POR_DESTINO_CSV,
             Paths.COOCURRENCIA_ENTIDADES_CSV,
-            Paths.PERFIL_DESTINO_CSV,
+         #   Paths.PERFIL_DESTINO_CSV,
         ]
 
     @property
