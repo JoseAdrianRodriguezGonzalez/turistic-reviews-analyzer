@@ -170,18 +170,18 @@ def calcular_coocurrencia_terminos(
     Retorna DataFrame con columnas:
         topic, termino_a, termino_b, co_ocurrencias, pmi_dentro_topico
     '''
-    if 'topic' not in df_corpus.columns:
+    if 'topico_id' not in df_corpus.columns:
         logger.warning('Columna topic no disponible. Saltando co-ocurrencia de términos.')
         return pd.DataFrame()
 
     vocab_set = set(vocabulario)
-    topicos_validos = sorted(df_corpus[df_corpus['topic'] != -1]['topic'].unique())
+    topicos_validos = sorted(df_corpus[df_corpus['topico_id'] != -1]['topico_id'].unique())
     logger.info('Calculando co-ocurrencia de términos para %d tópicos...', len(topicos_validos))
 
     todas_filas = []
 
     for topico in topicos_validos:
-        docs_topico = df_corpus[df_corpus['topic'] == topico][Params.COLUMNA_TEXTO].tolist()
+        docs_topico = df_corpus[df_corpus['topico_id'] == topico][Params.COLUMNA_TEXTO].tolist()
         n_docs_topico = len(docs_topico)
 
         # Frecuencia marginal de términos dentro del tópico
@@ -223,7 +223,7 @@ def calcular_coocurrencia_terminos(
 
     df = pd.DataFrame(todas_filas)
     if not df.empty:
-        df = df.sort_values(['topic', 'co_ocurrencias'], ascending=[True, False]).reset_index(drop=True)
+        df = df.sort_values(['topico_id', 'co_ocurrencias'], ascending=[True, False]).reset_index(drop=True)
 
     logger.info('Co-ocurrencias de términos: %d filas en %d tópicos', len(df), len(topicos_validos))
     return df

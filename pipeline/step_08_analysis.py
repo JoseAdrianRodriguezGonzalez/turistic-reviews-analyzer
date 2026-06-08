@@ -50,7 +50,7 @@ class StepAnalysis(BaseStep):
     @property
     def input_paths(self) -> list[Path]:
         return [
-            Paths.DOCS_WITH_TOPICS_CSV,
+        #    Paths.DOCS_WITH_TOPICS_CSV,
             Paths.UNIFIED_ANALYSIS_CSV,
             Paths.FEATURES_NLP_CSV,
             Paths.NER_GROUPS_JSON,
@@ -59,8 +59,8 @@ class StepAnalysis(BaseStep):
     @property
     def output_paths(self) -> list[Path]:
         paths = [
-            Paths.SENTIMIENTO_POR_DESTINO_CSV,
-            Paths.SENTIMIENTO_POR_TOPICO_CSV,
+          #  Paths.SENTIMIENTO_POR_DESTINO_CSV,
+          #  Paths.SENTIMIENTO_POR_TOPICO_CSV,
             Paths.ENTIDADES_POR_DESTINO_CSV,
             Paths.COOCURRENCIA_ENTIDADES_CSV,
             Paths.PERFIL_DESTINO_CSV,

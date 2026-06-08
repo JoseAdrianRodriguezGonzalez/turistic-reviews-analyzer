@@ -317,7 +317,6 @@ def _ejecutar_grid_search(
 
     return todos
 
-
 def run_clustering_pipeline(
     ejecutar_hdbscan    : bool = True,
     ejecutar_jerarquico : bool = True,
@@ -415,7 +414,6 @@ def run_clustering_pipeline(
         _exportar_comparacion_fuentes(resultados_por_fuente)
     else:
         logger.warning('Ninguna fuente produjo resultados; comparacion_fuentes.csv no generado')
-
     # Sincronizar Params activos con el mejor modelo encontrado por el grid search
     fuente_activa = Params.CLUSTERING_ACTIVO_FUENTE
     modelo_activo = Params.CLUSTERING_ACTIVO_MODELO
@@ -432,7 +430,16 @@ def run_clustering_pipeline(
                 'Params activos actualizados: CLUSTERING_ACTIVO_K=%d, CLUSTERING_ACTIVO_KEY=%s',
                 k_nuevo, key_nuevo,
             )
+    config_path = Paths.ENRICHMENT_DIR / "active_model.json"
 
+    best_model_info = {
+        "fuente": fuente_activa,
+        "modelo": key_nuevo,
+        "k": k_nuevo
+    }
+
+    with open(config_path, "w") as f:
+        json.dump(best_model_info, f)
     return resultados_por_fuente
 
 

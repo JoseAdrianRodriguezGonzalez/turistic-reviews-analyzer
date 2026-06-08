@@ -110,7 +110,7 @@ def run_analysis_pipeline(
     ejecutar_sentiment        : bool = True,
     ejecutar_entities         : bool = True,
     ejecutar_cooccurrence     : bool = True,
-    ejecutar_trends           : bool = True,
+    ejecutar_trends           : bool = False,
     ejecutar_outliers         : bool = True,
     ejecutar_sentiment_topics : bool = True,
 ) -> dict[str, dict]:
@@ -149,10 +149,24 @@ def run_analysis_pipeline(
         ejecutar_sentiment, ejecutar_entities, ejecutar_cooccurrence,
         ejecutar_trends, ejecutar_outliers, ejecutar_sentiment_topics,
     )
+    
+    # Paso 5: Detección de outliers
+    if ejecutar_outliers:
+        logger.info('\n--- Paso 1/6: Detección de outliers ---')
+        t0 = time.time()
+        try:
+            from analysis.outlier_detection import run_outlier_detection
+            resultados['outliers'] = run_outlier_detection()
+            logger.info('Outliers completados en %.1f s', time.time() - t0)
+        except Exception as error:
+            logger.error('Error en detección de outliers: %s', error)
+            resultados['outliers'] = {}
+    else:
+        logger.info('Detección de outliers omitida por configuración')
 
     # Paso 1: Análisis de sentimiento
     if ejecutar_sentiment:
-        logger.info('\n--- Paso 1/4: Análisis de sentimiento ---')
+        logger.info('\n--- Paso 2/6: Análisis de sentimiento ---')
         t0 = time.time()
         try:
             from analysis.sentiment_analysis import run_sentiment_analysis
@@ -163,6 +177,21 @@ def run_analysis_pipeline(
             resultados['sentiment'] = {}
     else:
         logger.info('Análisis de sentimiento omitido por configuración')
+    # Paso 6: Modelado de tópicos por sentimiento + análisis precio/valor/costo
+    if ejecutar_sentiment_topics:
+        logger.info('\n--- Paso 6/6: Modelado de tópicos por sentimiento ---')
+        t0 = time.time()
+        try:
+            from analysis.sentiment_topic_modeling import run_sentiment_topic_modeling
+            resultados['sentiment_topics'] = run_sentiment_topic_modeling()
+            logger.info('Tópicos por sentimiento completados en %.1f s', time.time() - t0)
+        except Exception as error:
+            logger.error('Error en modelado de tópicos por sentimiento: %s', error)
+            resultados['sentiment_topics'] = {}
+    else:
+        logger.info('Modelado de tópicos por sentimiento omitido por configuración')
+
+
 
     # Paso 2: Análisis de entidades NER
     if ejecutar_entities:
@@ -206,33 +235,7 @@ def run_analysis_pipeline(
     else:
         logger.info('Detección de tendencias omitida por configuración')
 
-    # Paso 5: Detección de outliers
-    if ejecutar_outliers:
-        logger.info('\n--- Paso 5/6: Detección de outliers ---')
-        t0 = time.time()
-        try:
-            from analysis.outlier_detection import run_outlier_detection
-            resultados['outliers'] = run_outlier_detection()
-            logger.info('Outliers completados en %.1f s', time.time() - t0)
-        except Exception as error:
-            logger.error('Error en detección de outliers: %s', error)
-            resultados['outliers'] = {}
-    else:
-        logger.info('Detección de outliers omitida por configuración')
-
-    # Paso 6: Modelado de tópicos por sentimiento + análisis precio/valor/costo
-    if ejecutar_sentiment_topics:
-        logger.info('\n--- Paso 6/6: Modelado de tópicos por sentimiento ---')
-        t0 = time.time()
-        try:
-            from analysis.sentiment_topic_modeling import run_sentiment_topic_modeling
-            resultados['sentiment_topics'] = run_sentiment_topic_modeling()
-            logger.info('Tópicos por sentimiento completados en %.1f s', time.time() - t0)
-        except Exception as error:
-            logger.error('Error en modelado de tópicos por sentimiento: %s', error)
-            resultados['sentiment_topics'] = {}
-    else:
-        logger.info('Modelado de tópicos por sentimiento omitido por configuración')
+    
 
     # Resumen
     if resultados:

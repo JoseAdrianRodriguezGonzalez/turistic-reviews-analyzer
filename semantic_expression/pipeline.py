@@ -25,12 +25,26 @@ from .BERTopic import BERTopic_analysis
 
 logger = logging.getLogger(__name__)
 
-_ANALYSIS_PATHS = [
-    Paths.SPANISH_ANALYSIS_JSON,
-    Paths.ENGLISH_ANALYSIS_JSON,
-    Paths.MIXED_ANALYSIS_JSON,
-]
+def _get_analysis_paths() -> list[str]:
+    lang = Params.LANGUAGE
 
+    if lang == "all":
+        return [
+            Paths.SPANISH_ANALYSIS_JSON,
+            Paths.ENGLISH_ANALYSIS_JSON,
+            Paths.MIXED_ANALYSIS_JSON,
+        ]
+
+    if lang == "es":
+        return [Paths.SPANISH_ANALYSIS_JSON]
+
+    if lang == "en":
+        return [Paths.ENGLISH_ANALYSIS_JSON]
+
+    if lang == "fr":
+        return [Paths.FRENCH_ANALYSIS_JSON]
+
+    raise ValueError(f"Idioma no soportado: {lang}")
 
 def _build_features(texts: list[str]) -> dict:
     X_tfidf, vectorizer = compute_tfidf(texts)
@@ -49,7 +63,8 @@ def _build_features(texts: list[str]) -> dict:
 
 def _extract_group_ner() -> list[dict]:
     all_data = []
-    for path in _ANALYSIS_PATHS:
+    paths=_get_analysis_paths()
+    for path in paths:
         if path.exists():
             all_data.extend(read_json(str(path)))
     cleaned = clean_entities(all_data)
@@ -61,7 +76,8 @@ def _extract_group_ner() -> list[dict]:
 def _build_doc_entity_map() -> dict[int, list[str]]:
     from preprocessing.individual_functions import normalize_ner
     doc_entities: dict[int, list[str]] = {}
-    for path in _ANALYSIS_PATHS:
+    paths=_get_analysis_paths()
+    for path in paths:
         if not path.exists():
             continue
         data = read_json(str(path))
@@ -86,7 +102,32 @@ def _enrich_texts_with_ner(df: pd.DataFrame, doc_entities: dict[int, list[str]])
         enriched_texts.append(text + " " + ent_tokens)
     return enriched_texts
 
+def _get_text_path() -> str:
+    lang = Params.LANGUAGE
 
+    if lang == "all":
+        return Paths.NORMALIZED_SPANISH_CSV
+
+    if lang == "es":
+        return Paths.SPANISH_CLEAN_CSV
+
+    if lang == "en":
+        return Paths.ENGLISH_CLEAN_CSV
+
+    if lang == "fr":
+        return Paths.FRENCH_CLEAN_CSV
+    raise ValueError(f"Idioma no soportado: {lang}")
+def _compute_embeddings(texts:list[str])->np.ndarray:
+    topic_bert = BERTopic_analysis(None, None, None, texts)
+    embedding = topic_bert.embedding_extraction(None, None)
+    return embedding
+def _run_topic_modeling(texts: list[str], embeddings: np.ndarray):
+    topic_bert = BERTopic_analysis(None, None, None, texts)
+
+    topics, probs = topic_bert.fit(embeddings=embeddings)
+    topic_info = topic_bert.get_topics()
+
+    return topic_bert, topics, probs, topic_info
 def pipe() -> None:
     Paths.FEATURES_DIR.mkdir(parents=True, exist_ok=True)
     Paths.MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -95,7 +136,7 @@ def pipe() -> None:
     logger.info("Extrayendo grupos NER...")
     analysis_ner = _extract_group_ner()
 
-    df = pd.read_csv(Paths.NORMALIZED_SPANISH_CSV)
+    df = pd.read_csv(_get_text_path())
     df["comentario_clean"] = df["comentario_clean"].fillna("").astype(str)
 
     doc_entities = _build_doc_entity_map()
@@ -117,20 +158,28 @@ def pipe() -> None:
     joblib.dump(features["vectorizer_yake"], Paths.YAKE_PKL)
 
     logger.info("Extrayendo embeddings con BERTopic...")
-    topic_bert = BERTopic_analysis(None, None, None, texts)
-    embedding = topic_bert.embedding_extraction(None, None)
+    embedding=_compute_embeddings(texts)
     np.save(Paths.DOCS_WITH_TOPICS_NPY, embedding)
+    df["text_enriched"]=texts
+    df.to_csv(Paths.ENRICHMENT_TEXTS, index=False)
+    logger.info("Semantic pipe completado.")
 
-    topics, probs = topic_bert.fit()
-    topic_info = topic_bert.get_topics()
+def pipe_topics():
+    df = pd.read_csv(_get_text_path())
+    df["comentario_clean"] = df["comentario_clean"].fillna("").astype(str)
+
+    embeddings = np.load(Paths.EMBEDDINGS_NPY)
+
+    texts = pd.read_csv(Paths.ENRICHMENT_TEXTS)
+
+    topic_bert, topics, probs, topic_info = _run_topic_modeling(texts, embeddings)
 
     df["topic"] = topics
     df.to_csv(Paths.DOCS_WITH_TOPICS_CSV, index=False)
     topic_info.to_csv(Paths.TOPICS_CSV, index=False)
+
     topic_bert.model.save(str(Paths.BERTOPIC_MODEL_DIR))
-
     logger.info("pipe() completado. Tópicos encontrados: %d", len(topic_info))
-
 
 def pipe_microtopics() -> None:
     df = pd.read_csv(Paths.DOCS_WITH_TOPICS_CSV)

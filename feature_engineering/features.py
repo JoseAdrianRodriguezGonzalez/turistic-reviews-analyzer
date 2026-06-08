@@ -34,32 +34,72 @@ logger = logging.getLogger(__name__)
 
 
 def _load_all_analysis_csv() -> pd.DataFrame:
-    paths = [
-        Paths.SPANISH_ANALYSIS_CSV,
-        Paths.ENGLISH_ANALYSIS_CSV,
-        Paths.MIXED_ANALYSIS_CSV,
-    ]
-    dfs = [pd.read_csv(p) for p in paths if p.exists()]
-    df_all = pd.concat(dfs, ignore_index=True)
-    return df_all.drop_duplicates(subset=['indice'])
+    lang=Params.LANGUAGE
+    if lang=="all":
+        paths = [
+            Paths.SPANISH_ANALYSIS_CSV,
+            Paths.ENGLISH_ANALYSIS_CSV,
+            Paths.MIXED_ANALYSIS_CSV,
+        ]
+        dfs = [pd.read_csv(p) for p in paths if p.exists()]
+        if not dfs:
+            raise RuntimeError("No hay archivos de análisis")
+        df_all = pd.concat(dfs, ignore_index=True)
+        return df_all.drop_duplicates(subset=['indice'])
+    if lang == "es":
+        path = Paths.SPANISH_ANALYSIS_CSV
+    elif lang == "en":
+        path = Paths.ENGLISH_ANALYSIS_CSV
+    elif lang == "fr":
+        path = Paths.FRENCH_ANALYSIS_CSV
+    else:
+        raise ValueError(f"Idioma no soportado: {lang}")
+    if not path.exists():
+        raise RuntimeError(f"No existe archivo de análisis: {path}")
 
+    df = pd.read_csv(path)
+
+    return df.drop_duplicates(subset=["indice"])
 
 def _load_all_analysis_json() -> list[dict]:
-    paths = [
-        Paths.SPANISH_ANALYSIS_JSON,
-        Paths.ENGLISH_ANALYSIS_JSON,
-        Paths.MIXED_ANALYSIS_JSON,
-    ]
-    all_data: list[dict] = []
-    for p in paths:
-        if p.exists():
-            with open(p, encoding='utf-8') as f:
-                all_data.extend(json.load(f))
+    lang = Params.LANGUAGE
 
+    # CASO ALL
+    if lang == "all":
+        paths = [
+            Paths.SPANISH_ANALYSIS_JSON,
+            Paths.ENGLISH_ANALYSIS_JSON,
+            Paths.MIXED_ANALYSIS_JSON,
+        ]
+
+        all_data: list[dict] = []
+        for p in paths:
+            if p.exists():
+                with open(p, encoding="utf-8") as f:
+                    all_data.extend(json.load(f))
+
+    # CASO SINGLE LANGUAGE
+    else:
+        if lang == "es":
+            path = Paths.SPANISH_ANALYSIS_JSON
+        elif lang == "en":
+            path = Paths.ENGLISH_ANALYSIS_JSON
+        elif lang == "fr":
+            path = Paths.FRENCH_ANALYSIS_JSON
+        else:
+            raise ValueError(f"Idioma no soportado: {lang}")
+
+        if not path.exists():
+            raise RuntimeError(f"No existe archivo JSON: {path}")
+
+        with open(path, encoding="utf-8") as f:
+            all_data = json.load(f)
+
+    # deduplicación (común a ambos casos)
     seen: set = set()
     unique: list[dict] = []
     for row in all_data:
-        idx = row['indice']
+        idx = row["indice"]
         if idx not in seen:
             unique.append(row)
             seen.add(idx)
@@ -108,9 +148,9 @@ def run_feature_pipeline(
     df = df_clean.merge(df_analysis, on='indice', how='left')
     cleaned_series = df[Params.COLUMNA_COMENTARIO]
     corpus_list = cleaned_series.tolist()
-
+    names={"es":Params.SPACY_MODEL_ES,"en":Params.SPACY_MODEL_EN,"fr":Params.SPACY_MODEL_FR,"all":Params.SPACY_MODEL_ES}
     # Cargar modelo spaCy (compartido entre pos y entity features)
-    nlp = load_spacy_model()
+    nlp = load_spacy_model(model_name=names[Params.LANGUAGE])
 
     logger.info('Calculando features de longitud de texto')
     text_feats = compute_text_length_features(cleaned_series)

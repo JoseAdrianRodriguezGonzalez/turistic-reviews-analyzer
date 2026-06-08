@@ -92,6 +92,7 @@ class Paths:
     YAKE_PKL              = MODELS_DIR / "yake_vectorizer.pkl"
     # Resultados de BERTopic
     RESULTS_DIR           = DATA_DIR / "results"
+    ENRICHMENT_TEXTS = RESULTS_DIR /"text_enrich.csv"
     DOCS_WITH_TOPICS_CSV  = RESULTS_DIR / "docs_with_topics.csv"
     TOPICS_CSV            = RESULTS_DIR / "topics.csv"
     MICROTOPICS_CSV       = RESULTS_DIR / "microtopics.csv"
@@ -114,7 +115,7 @@ class Paths:
     ENRICHMENT_ACTIVE_DIR        = ENRICHMENT_DIR / "embeddings" / "kmeans_k9"
     # Modelo LLM local para topic naming (requiere llama_cpp)
     LLAMA_MODEL_PATH             = MODELS_DIR / "mistral-7b-instruct-v0.3-q4_k_m.gguf"
-    ENRICHMENT_KEYWORDS_CSV      = ENRICHMENT_ACTIVE_DIR / "keywords_por_cluster.csv"
+    #ENRICHMENT_KEYWORDS_CSV      = ENRICHMENT_ACTIVE_DIR / "keywords_por_cluster.csv"
     # Análisis
     ANALYSIS_DIR                 = DATA_DIR / "analysis"
     ANALYSIS_RESUMEN_CSV         = ANALYSIS_DIR / "resumen_analysis.csv"
@@ -157,7 +158,7 @@ class Paths:
 # PARÁMETROS DEL PIPELINE
 
 ACCESSIBLE_PALETTES = {"viridis", "cividis", "plasma", "inferno", "sunset"}
-SUPPORTED_LANGUAGES = {"es", "en", "fr"}
+SUPPORTED_LANGUAGES = {"es", "en", "fr","all"}
 
 class Params:
     """
@@ -186,6 +187,7 @@ class Params:
     LANG_ENGLISH = "en"
     LANG_FRENCH  = "fr"
     LANG_MIXED   = "mixed"
+    LANG_ALL="all"
 
     # Dispositivo de cómputo: "auto" | "gpu" | "cpu"
     DEVICE: str = "gpu"
@@ -394,7 +396,7 @@ class Params:
     # Número de tópicos objetivo por grupo
     # hdbscan: reduce jerárquicamente si encuentra más (0 = sin reducción, usa los naturales)
     # kmeans:  k fijo, siempre produce exactamente este número
-    SENTIMENT_TOPIC_NR_TOPICS : int = 5
+    SENTIMENT_TOPIC_NR_TOPICS : int = 10
     # Top-N comentarios más similares al concepto 'precio/valor/costo'
     PRECIO_VALOR_COSTO_TOP_N  : int = 5
 
@@ -598,7 +600,7 @@ class Params:
         cls.LANGUAGE = args.language
         cls.REPORT_TITLE = args.title
         cls.COLOR_PALETTE = args.palette
-
+        
         # Parámetros opcionales del análisis de sentimiento
         if getattr(args, 'sentiment_idioma', None):
             cls.SENTIMENT_IDIOMA = args.sentiment_idioma
@@ -619,7 +621,8 @@ class Params:
         _logger.info("  Idioma      : %s", cls.LANGUAGE)
         _logger.info("  Título      : %s", cls.REPORT_TITLE)
         _logger.info("  Paleta      : %s", cls.COLOR_PALETTE)
-
+        if cls.LANGUAGE not in SUPPORTED_LANGUAGES:
+            raise ValueError(f"Idioma no válido: {cls.LANGUAGE}")
         # Advertir si la paleta no es una de las accesibles recomendadas
         if cls.COLOR_PALETTE not in ACCESSIBLE_PALETTES:
             _logger.warning(

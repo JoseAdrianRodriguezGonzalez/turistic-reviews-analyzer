@@ -314,9 +314,24 @@ def _enriquecer_fuente(
 
     logger.info('Fuente %s completada', nombre_fuente)
 
+def get_text_path() -> Path:
+    lang = Params.LANGUAGE
 
+    if lang == "all":
+        return Paths.NORMALIZED_SPANISH_CSV
+
+    mapping = {
+        "es": Paths.SPANISH_CLEAN_CSV,
+        "en": Paths.ENGLISH_CLEAN_CSV,
+        "fr": Paths.FRENCH_CLEAN_CSV,
+    }
+
+    if lang not in mapping:
+        raise ValueError(f"Idioma no soportado: {lang}")
+
+    return mapping[lang]
 def run_enrichment_pipeline(
-    fuentes: list[str] | None = None,
+    active:str,fuentes: list[str] | None = None
 ) -> None:
     '''
     Pipeline completo de enriquecimiento de tópicos.
@@ -333,15 +348,16 @@ def run_enrichment_pipeline(
 
     logger.info('Iniciando pipeline de topic enrichment')
     logger.info('Fuentes a procesar: %s', fuentes_a_procesar)
+    text_path=get_text_path()
 
     # Cargar corpus una sola vez — se reutiliza para todas las fuentes
-    if not Paths.NORMALIZED_SPANISH_CSV.exists():
+    if not text_path.exists():
         logger.error(
-            'Corpus no encontrado en %s — pipeline abortado', Paths.NORMALIZED_SPANISH_CSV
+            'Corpus no encontrado en %s — pipeline abortado', text_path
         )
         return
 
-    corpus = _cargar_corpus(Paths.NORMALIZED_SPANISH_CSV)
+    corpus = _cargar_corpus(text_path)
 
     # Lista acumuladora para el resumen global
     filas_resumen: list[dict] = []

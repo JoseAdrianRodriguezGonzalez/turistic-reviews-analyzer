@@ -81,13 +81,13 @@ def _cargar_corpus() -> pd.DataFrame:
     comparten el mismo orden de documentos producido por el step 05.
     '''
     path_clean  = Paths.NORMALIZED_SPANISH_CSV
-    path_topics = Paths.DOCS_WITH_TOPICS_CSV
+   # path_topics = Paths.DOCS_WITH_TOPICS_CSV
 
     if not path_clean.exists():
         raise FileNotFoundError(f'No encontrado: {path_clean}')
 
     df = pd.read_csv(path_clean).reset_index(drop=True)
-
+    """
     if path_topics.exists():
         df_topics = pd.read_csv(path_topics).reset_index(drop=True)
         # Solo agregar columnas que no existan ya en df (evita conflictos de merge)
@@ -99,7 +99,7 @@ def _cargar_corpus() -> pd.DataFrame:
             df = df.join(df_topics[cols])
     else:
         logger.warning('docs_with_topics.csv no encontrado — sin columnas topic/location/lang')
-
+    """
     logger.info('Corpus cargado: %d documentos, columnas: %s', len(df), df.columns.tolist())
     return df
 
