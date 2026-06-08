@@ -37,6 +37,36 @@ from config import Params, Paths
 
 logger = logging.getLogger(__name__)
 
+def _cargar_corpus_unificado() -> pd.DataFrame:
+    """
+    Carga y unifica los datasets de sentiment_topics (positivo + negativo)
+    """
+
+    path_pos= Paths.SENTIMENT_TOPICS_DIR/"topicos_positivo_scatter.csv"
+    path_neg= Paths.SENTIMENT_TOPICS_DIR/"topicos_negativo_scatter.csv"
+
+    if not path_pos.exists() and not path_neg.exists():
+        raise FileNotFoundError(
+            "No existen archivos de sentiment_topics. Ejecuta step 8 primero."
+        )
+
+    dfs = []
+
+    if path_pos.exists():
+        df_pos = pd.read_csv(path_pos)
+        df_pos['polaridad'] = 'positivo'
+        dfs.append(df_pos)
+
+    if path_neg.exists():
+        df_neg = pd.read_csv(path_neg)
+        df_neg['polaridad'] = 'negativo'
+        dfs.append(df_neg)
+
+    df = pd.concat(dfs, ignore_index=True)
+
+    logger.info("Corpus unificado cargado: %d filas", len(df))
+    df.to_csv(Paths.DOCS_WITH_TOPICS_CSV)
+    return df
 
 def _cargar_ner_groups(path: Path) -> list[dict]:
     '''
@@ -67,9 +97,9 @@ def _cargar_corpus_sentimiento(path_sentimiento: Path, path_docs: Path) -> pd.Da
             path_sentimiento,
         )
         df = pd.read_csv(path_docs)
-        df['sentimiento_numerico'] = np.nan
-        df['sentimiento_estrella'] = 'sin_etiqueta'
-        df['estrellas'] = np.nan
+      #  df['sentimiento_numerico'] = np.nan
+      #  df['sentimiento_estrella'] = 'sin_etiqueta'
+      #  df['estrellas'] = np.nan
 
     return df
 
@@ -103,9 +133,9 @@ def _enriquecer_entidad(
     filas = df_corpus.iloc[[indice_a_fila[idx] for idx in indices_validos]]
 
     # Sentimiento
-    sentimiento_values = filas['sentimiento_numerico'].dropna()
-    sentimiento_medio  = round(sentimiento_values.mean(), 4) if len(sentimiento_values) > 0 else np.nan
-    n_con_rating       = int(sentimiento_values.notna().sum()) if 'sentimiento_numerico' in filas else 0
+  #  sentimiento_values = filas['sentimiento_numerico'].dropna()
+   # sentimiento_medio  = round(sentimiento_values.mean(), 4) if len(sentimiento_values) > 0 else np.nan
+    #n_con_rating       = int(sentimiento_values.notna().sum()) if 'sentimiento_numerico' in filas else 0
 
     # Distribución por categoría de sentimiento
     if 'sentimiento_estrella' in filas.columns:
@@ -128,11 +158,11 @@ def _enriquecer_entidad(
         destino_principal = None
 
     # Distribución por tópico
-    if 'topic' in filas.columns:
-        topicos_validos = filas[filas['topic'] != -1]['topic']
+    if 'topico_id' in filas.columns:
+        topicos_validos = filas[filas['topico_id'] != -1]['topico_id']
         if len(topicos_validos) > 0:
             topico_principal = int(topicos_validos.value_counts().index[0])
-            pct_ruido = round((filas['topic'] == -1).sum() / len(filas) * 100, 2)
+            pct_ruido = round((filas['topico_id'] == -1).sum() / len(filas) * 100, 2)
         else:
             topico_principal = -1
             pct_ruido = 100.0
@@ -144,8 +174,8 @@ def _enriquecer_entidad(
         'entidad'             : entidad['text'],
         'label'               : entidad['label'],
         'n_documentos'        : len(indices_validos),
-        'n_con_rating'        : n_con_rating,
-        'sentimiento_medio'   : sentimiento_medio,
+  #      'n_con_rating'        : n_con_rating,
+  #      'sentimiento_medio'   : sentimiento_medio,
         'estrella_media'      : estrella_media,
         'n_negativo'          : dist_sentimiento.get('negativo', 0),
         'n_neutro'            : dist_sentimiento.get('neutro', 0),
@@ -267,17 +297,18 @@ def _entidades_por_topico(
     Para cada tópico BERTopic (excluyendo ruido -1), calcula las top_n
     entidades más mencionadas con su sentimiento promedio.
     '''
-    if 'topic' not in df_corpus.columns:
+    if 'topico_id' not in df_corpus.columns:
         logger.warning('Columna topic no disponible. Saltando entidades por tópico.')
         return pd.DataFrame()
 
-    indice_a_topico = dict(zip(df_corpus['indice'], df_corpus['topic']))
+    indice_a_topico = dict(zip(df_corpus['indice'], df_corpus['topico_id']))
+    """
     indice_a_sentimiento = (
         dict(zip(df_corpus['indice'], df_corpus['sentimiento_numerico']))
         if 'sentimiento_numerico' in df_corpus.columns
         else {}
     )
-
+"""
     filas = []
     for entidad in ner_grupos:
         conteo_por_topico: Counter = Counter()
@@ -288,9 +319,9 @@ def _entidades_por_topico(
             if topico == -1:
                 continue
             conteo_por_topico[topico] += 1
-            sent = indice_a_sentimiento.get(idx, np.nan)
-            if isinstance(sent, float) and not np.isnan(sent):
-                sentimiento_por_topico.setdefault(topico, []).append(sent)
+           # sent = indice_a_sentimiento.get(idx, np.nan)
+            #if isinstance(sent, float) and not np.isnan(sent):
+            #    sentimiento_por_topico.setdefault(topico, []).append(sent)
 
         for topico, n in conteo_por_topico.items():
             if n < Params.MIN_DOCS_ENTIDAD:
@@ -301,7 +332,7 @@ def _entidades_por_topico(
                 'entidad'           : entidad['text'],
                 'label'             : entidad['label'],
                 'n_documentos'      : n,
-                'sentimiento_medio' : round(np.mean(valores_sent), 4) if valores_sent else np.nan,
+             #   'sentimiento_medio' : round(np.mean(valores_sent), 4) if valores_sent else np.nan,
             })
 
     df = pd.DataFrame(filas)
@@ -309,8 +340,8 @@ def _entidades_por_topico(
         return df
 
     df = (
-        df.sort_values(['topic', 'n_documentos'], ascending=[True, False])
-        .groupby('topic')
+        df.sort_values(['topico_id', 'n_documentos'], ascending=[True, False])
+        .groupby('topico_id')
         .head(top_n)
         .reset_index(drop=True)
     )
@@ -328,7 +359,7 @@ def run_entity_analysis() -> dict[str, pd.DataFrame]:
     '''
     Paths.ENTITIES_DIR.mkdir(parents=True, exist_ok=True)
     logger.info('=== Iniciando análisis de entidades ===')
-
+    _cargar_corpus_unificado()
     if not Paths.NER_GROUPS_JSON.exists():
         logger.error('ner_groups.json no encontrado en %s — pipeline abortado', Paths.NER_GROUPS_JSON)
         return {}
@@ -342,8 +373,8 @@ def run_entity_analysis() -> dict[str, pd.DataFrame]:
     )
     df_entidades.to_csv(Paths.ENTIDADES_CON_SENTIMIENTO_CSV, index=False, encoding='utf-8-sig')
 
-    df_por_destino = _entidades_por_destino(ner_grupos[:Params.MAX_ENTIDADES], df_corpus)
-    df_por_destino.to_csv(Paths.ENTIDADES_POR_DESTINO_CSV, index=False, encoding='utf-8-sig')
+  #  df_por_destino = _entidades_por_destino(ner_grupos[:Params.MAX_ENTIDADES], df_corpus)
+  #  df_por_destino.to_csv(Paths.ENTIDADES_POR_DESTINO_CSV, index=False, encoding='utf-8-sig')
 
     df_por_topico = _entidades_por_topico(ner_grupos[:Params.MAX_ENTIDADES], df_corpus)
     df_por_topico.to_csv(Paths.ENTIDADES_POR_TOPICO_CSV, index=False, encoding='utf-8-sig')
@@ -352,7 +383,7 @@ def run_entity_analysis() -> dict[str, pd.DataFrame]:
 
     return {
         'entidades'    : df_entidades,
-        'por_destino'  : df_por_destino,
+   #     'por_destino'  : df_por_destino,
         'por_topico'   : df_por_topico,
     }
 

@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 
 def process_pipeline(
-    input_path: str,language:str="all"
+    input_path: str,columna:str,language:str="all"
 ) -> tuple[list[tuple], list[tuple], list[tuple], list[tuple]]:
     """
     Ejecuta el pipeline completo de preprocesamiento sobre el corpus crudo.
@@ -57,6 +57,7 @@ def process_pipeline(
         dict_limpio contiene: indice, comentario_clean, lang, location
     """
     try:
+        print(input_path)
         df = pd.read_csv(input_path, encoding="utf-8")
     except Exception as error:
         raise RuntimeError(
@@ -76,7 +77,7 @@ def process_pipeline(
     for idx, row in df.iterrows():
 
         try:
-            comentario = row["text"]
+            comentario = row[columna]
           #  estrellas  = row.get("stars", None)
 
             text = normalize_text(comentario)

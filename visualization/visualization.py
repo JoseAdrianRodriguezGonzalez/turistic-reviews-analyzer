@@ -12,22 +12,31 @@ OUTPUT_FILE = str(Paths.REPORTE_INTERACTIVO_HTML)
 
 
 def cargar_datos(base_path):
-    pos_df = pd.read_csv(f"{base_path}/topicos_positivo_scatter.csv")
-    neg_df = pd.read_csv(f"{base_path}/topicos_negativo_scatter.csv")
-    pvc_df = pd.read_csv(f"{base_path}/precio_valor_costo_scatter.csv")
 
-    with open(f"{base_path}/topicos_positivos.json", encoding='utf-8') as f:
-        pos_json = json.load(f)
-    with open(f"{base_path}/topicos_negativos.json", encoding='utf-8') as f:
-        neg_json = json.load(f)
-    try:
-        with open(f"{base_path}/precio_valor_costo.json", encoding='utf-8') as f:
-            pvc_json = json.load(f)
-    except FileNotFoundError:
-        pvc_json = {}
+    def safe_read_csv(path):
+        try:
+            return pd.read_csv(path)
+        except FileNotFoundError:
+            return pd.DataFrame() 
+
+    def safe_read_json(path):
+        try:
+            with open(path, encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+
+    # CSV (ahora opcionales)
+    pos_df = safe_read_csv(f"{base_path}/topicos_positivo_scatter.csv")
+    neg_df = safe_read_csv(f"{base_path}/topicos_negativo_scatter.csv")
+    pvc_df = safe_read_csv(f"{base_path}/precio_valor_costo_scatter.csv")
+
+    # JSON (ya lo tenías bien)
+    pos_json = safe_read_json(f"{base_path}/topicos_positivos.json")
+    neg_json = safe_read_json(f"{base_path}/topicos_negativos.json")
+    pvc_json = safe_read_json(f"{base_path}/precio_valor_costo.json")
 
     return pos_df, neg_df, pvc_df, pos_json, neg_json, pvc_json
-
 
 def mapear_keywords(df, json_data):
     lkp = {}
@@ -95,13 +104,41 @@ def generar_scatter(df, titulo, color_col, palette_name, is_pvc=False):
         )
     )
     return fig
+def generar_barras_frecuencias(json_data, titulo):
+    palabras = [item["palabra"] for item in json_data["frecuencias"][:20]]
+    freqs = [item["frecuencia"] for item in json_data["frecuencias"][:20]]
 
+    df = pd.DataFrame({
+        "palabra": palabras[::-1],
+        "frecuencia": freqs[::-1]
+    })
+
+    fig = px.bar(
+        df,
+        x="frecuencia",
+        y="palabra",
+        orientation="h",
+        title=titulo
+    )
+
+    fig.update_layout(
+        template="plotly_white",
+        margin=dict(l=30, r=30, t=60, b=30)
+    )
+
+    return fig
+def cargar_grafo_html():
+    path = Paths.VISUALIZATION_DIR / "topic_graph_2.html"
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return "<p style='color:#7f8c8d;'>Grafo no disponible</p>"
 
 def generar_html_reporte(fig_pos, fig_neg, fig_pvc, pvc_json, output_file):
     html_pos = fig_pos.to_html(full_html=False, include_plotlyjs='cdn', config={'scrollZoom': True})
     html_neg = fig_neg.to_html(full_html=False, include_plotlyjs=False, config={'scrollZoom': True})
     html_pvc = fig_pvc.to_html(full_html=False, include_plotlyjs=False, config={'scrollZoom': True})
-
+    graph_html = cargar_grafo_html()
     # Extraer y formatear el Top 5
     top5_html = ""
     top5_list = pvc_json.get('comentarios_mas_relevantes', [])
@@ -202,6 +239,15 @@ def generar_html_reporte(fig_pos, fig_neg, fig_pvc, pvc_json, output_file):
                 {top5_html}
             </div>
         </div>
+
+        <div class="chart-card">
+            <h2>Grafo de Co-ocurrencia de Entidades</h2>
+            <p class="instructions">
+                Interacción: zoom, drag, hover sobre nodos.
+            </p>
+
+            {graph_html}
+        </div>
     </body>
     </html>
     """
@@ -212,17 +258,31 @@ def generar_html_reporte(fig_pos, fig_neg, fig_pvc, pvc_json, output_file):
         f.write(html_template)
     print(f"Reporte generado con éxito en:\n{output_file}")
 
-
+def hay_topicos(json_data):
+    return len(json_data.get("topicos", [])) > 0
+from visualization.topic_graph_2 import run_topic_graph_interactivo 
 def run_reporte_interactivo() -> None:
     palette = Params.COLOR_PALETTE or 'plasma'
 
     pos_df, neg_df, pvc_df, pos_json, neg_json, pvc_json = cargar_datos(INPUT_DIR)
 
-    pos_df = mapear_keywords(pos_df, pos_json)
-    neg_df = mapear_keywords(neg_df, neg_json)
-
-    fig_pos = generar_scatter(pos_df, "Distribución de Tópicos (Positivos)", "nombre_topico", palette)
-    fig_neg = generar_scatter(neg_df, "Distribución de Tópicos (Negativos)", "nombre_topico", palette)
+    if hay_topicos(pos_json):
+        fig_pos = generar_scatter(pos_df, "Distribución de Tópicos (Positivos)", "nombre_topico", palette)
+        pos_df = mapear_keywords(pos_df, pos_json)
+        
+    else:
+        fig_pos = generar_barras_frecuencias(
+        pos_json,
+        "Palabras más frecuentes (Positivos)")
+    if hay_topicos(neg_json):
+        fig_neg = generar_scatter(neg_df, "Distribución de Tópicos (Negativos)", "nombre_topico", palette)
+        neg_df = mapear_keywords(neg_df, neg_json)
+    else:
+        fig_neg = generar_barras_frecuencias(
+        neg_json,
+        "Palabras más frecuentes (Negativos)"
+    )
+        
     fig_pvc = generar_scatter(pvc_df, 'Similitud con "Precio/Valor/Costo"', "similitud_precio", palette, is_pvc=True)
 
     generar_html_reporte(fig_pos, fig_neg, fig_pvc, pvc_json, OUTPUT_FILE)

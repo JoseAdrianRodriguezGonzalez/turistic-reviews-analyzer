@@ -396,7 +396,7 @@ class Params:
     # Número de tópicos objetivo por grupo
     # hdbscan: reduce jerárquicamente si encuentra más (0 = sin reducción, usa los naturales)
     # kmeans:  k fijo, siempre produce exactamente este número
-    SENTIMENT_TOPIC_NR_TOPICS : int = 5
+    SENTIMENT_TOPIC_NR_TOPICS : int = 10
     # Top-N comentarios más similares al concepto 'precio/valor/costo'
     PRECIO_VALOR_COSTO_TOP_N  : int = 5
 
@@ -600,7 +600,7 @@ class Params:
         cls.LANGUAGE = args.language
         cls.REPORT_TITLE = args.title
         cls.COLOR_PALETTE = args.palette
-
+        
         # Parámetros opcionales del análisis de sentimiento
         if getattr(args, 'sentiment_idioma', None):
             cls.SENTIMENT_IDIOMA = args.sentiment_idioma

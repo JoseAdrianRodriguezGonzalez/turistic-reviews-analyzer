@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 
 
 # CATEGORIZACIÓN DE SENTIMIENTO
-
+"""
 def _mapear_sentimiento_estrella(estrellas: pd.Series) -> pd.Series:
     '''
     Convierte la columna de estrellas a etiqueta de sentimiento categórico.
@@ -58,17 +58,17 @@ def _mapear_sentimiento_estrella(estrellas: pd.Series) -> pd.Series:
         4-5  -> positivo
         NaN  -> sin_etiqueta
     '''
-    def _categorizar(valor):
-        if pd.isna(valor):
-            return 'sin_etiqueta'
-        if valor <= 2:
-            return 'negativo'
-        if valor == 3:
-            return 'neutro'
-        return 'positivo'
+ #   def _categorizar(valor):
+ #       if pd.isna(valor):
+ #           return 'sin_etiqueta'
+ #       if valor <= 2:
+ #           return 'negativo'
+ #       if valor == 3:
+ #           return 'neutro'
+ #       return 'positivo'
 
-    return estrellas.apply(_categorizar)
-
+  #  return estrellas.apply(_categorizar)
+"""
 
 def _mapear_sentimiento_numerico(categoria: pd.Series) -> pd.Series:
     '''
@@ -83,7 +83,7 @@ def _mapear_sentimiento_numerico(categoria: pd.Series) -> pd.Series:
     }
     return categoria.map(mapa)
 
-
+"""
 def _mapear_sentimiento_binario(sentimiento_estrella: pd.Series) -> pd.Series:
     '''
     Colapsa la clasificación de 3 clases a binaria usando umbral de polaridad.
@@ -101,11 +101,26 @@ def _mapear_sentimiento_binario(sentimiento_estrella: pd.Series) -> pd.Series:
         return 'sin_etiqueta'
 
     return sentimiento_estrella.apply(_binarizar)
-
+"""
 
 # CARGA Y ENSAMBLADO
+def get_text_path() -> Path:
+    lang = Params.LANGUAGE
 
-def _cargar_corpus_base() -> pd.DataFrame:
+    if lang == "all":
+        return Paths.NORMALIZED_SPANISH_CSV
+
+    mapping = {
+        "es": Paths.SPANISH_CLEAN_CSV,
+        "en": Paths.ENGLISH_CLEAN_CSV,
+        "fr": Paths.FRENCH_CLEAN_CSV,
+    }
+
+    if lang not in mapping:
+        raise ValueError(f"Idioma no soportado: {lang}")
+
+    return mapping[lang]
+def _cargar_corpus_base(hasTopic:bool=False) -> pd.DataFrame:
     '''
     Carga y ensambla el corpus base unificando:
         - docs_with_topics.csv  (topic, location, lang)
@@ -116,7 +131,8 @@ def _cargar_corpus_base() -> pd.DataFrame:
     El join se hace por indice. Los campos faltantes se rellenan con NaN.
     '''
     logger.info('Cargando docs_with_topics.csv...')
-    df_docs = pd.read_csv(Paths.DOCS_WITH_TOPICS_CSV)
+    if hasTopic:
+        df_docs = pd.read_csv(Paths.DOCS_WITH_TOPICS_CSV)
 
     logger.info('Cargando analysis_unified.csv...')
     df_unified_all = pd.read_csv(Paths.UNIFIED_ANALYSIS_CSV)
@@ -125,8 +141,8 @@ def _cargar_corpus_base() -> pd.DataFrame:
     if col_comentario in df_unified_all.columns:
         cols_unified.append(col_comentario)
     df_unified = df_unified_all[cols_unified]
-
-    logger.info('Cargando normalized_spanish.csv...')
+    text_path=get_text_path()
+    logger.info('Cargando normalized_spanish.csv...',text_path.name)
     df = pd.read_csv(Paths.NORMALES_CSV, usecols=['indice', Params.COLUMNA_TEXTO])
 
     logger.info('Cargando features_nlp.csv...')
@@ -135,10 +151,11 @@ def _cargar_corpus_base() -> pd.DataFrame:
         usecols=['indice', 'pos_ratio_adj', 'pos_ratio_adv'],
     )
 
-    df = df_docs.merge(df_unified, on='indice', how='left')
+    df = df.merge(df_unified, on='indice', how='left')
     #df = df.merge(df_normalized, on='indice', how='left')
     df = df.merge(df_features, on='indice', how='left')
-#    df=df.merge(df_docs,on='indices',how='left')
+    if hasTopic:
+        df=df.merge(df_docs,on='indices',how='left')
     logger.info(
         'Corpus ensamblado: %d documentos',
         len(df),
@@ -287,8 +304,25 @@ def _binarizar_etiqueta_transformer(etiqueta: str) -> str:
     if etiqueta in ('negativo', 'neutro'):
         return 'negativo'
     return 'sin_etiqueta'
+def run_topics_analysis():
+    
+    df = _cargar_corpus_base( True)    
+    df.to_csv(Paths.CORPUS_CON_SENTIMIENTO_CSV, index=False, encoding='utf-8-sig')
+    #df_por_topico  = _sentimiento_por_topico(df, topics_meta)
+  #  df_por_destino = _sentimiento_por_destino(df)
+  #  df_cruce       = _sentimiento_por_topico_destino(df)
 
-
+  #  df_por_topico.to_csv(Paths.SENTIMIENTO_POR_TOPICO_CSV, index=False, encoding='utf-8-sig')
+  #  df_por_destino.to_csv(Paths.SENTIMIENTO_POR_DESTINO_CSV, index=False, encoding='utf-8-sig')
+  #  df_cruce.to_csv(Paths.SENTIMIENTO_POR_TOPICO_DESTINO_CSV, index=False, encoding='utf-8-sig')
+    return {
+      #  'corpus'             : df,
+      #  'positivos'          : df_positivos,
+     #   'negativos'          : df_negativos,
+     #   'por_topico'         : df_por_topico,
+     #   'por_destino'        : df_por_destino,
+     #   'por_topico_destino' : df_cruce,
+    }
 def run_sentiment_analysis() -> dict[str, pd.DataFrame]:
     output_dir = Paths.SENTIMENT_DIR
     '''
@@ -307,10 +341,10 @@ def run_sentiment_analysis() -> dict[str, pd.DataFrame]:
     output_dir.mkdir(parents=True, exist_ok=True)
     logger.info('=== Iniciando análisis de sentimiento ===')
     
-    topics_meta = None
-    if Paths.TOPICS_CSV.exists():
-        topics_meta = pd.read_csv(Paths.TOPICS_CSV)
-        logger.info('Metadatos de tópicos cargados: %d tópicos', len(topics_meta))
+  #  topics_meta = None
+  #  if Paths.TOPICS_CSV.exists():
+  #      topics_meta = pd.read_csv(Paths.TOPICS_CSV)
+  #      logger.info('Metadatos de tópicos cargados: %d tópicos', len(topics_meta))
     
     df = _cargar_corpus_base()
     print("si")
@@ -331,7 +365,7 @@ def run_sentiment_analysis() -> dict[str, pd.DataFrame]:
     df_transformer = run_transformer_sentiment(
         textos_originales  = textos_orig,
         textos_cleaned     = textos_cleaned,
-        idioma             = Params.SENTIMENT_IDIOMA,
+        idioma             = Params.LANGUAGE,
         metodo             = Params.SENTIMENT_METODO,
         usar_texto_original= Params.SENTIMENT_TEXTO == 'original',
         features           = Params.SENTIMENT_FEATURES,
@@ -353,13 +387,13 @@ def run_sentiment_analysis() -> dict[str, pd.DataFrame]:
 
     df_positivos, df_negativos = _exportar_grupos_binarios(df, output_dir)
 
-    df_por_topico  = _sentimiento_por_topico(df, topics_meta)
-    df_por_destino = _sentimiento_por_destino(df)
-    df_cruce       = _sentimiento_por_topico_destino(df)
+  #  df_por_topico  = _sentimiento_por_topico(df, topics_meta)
+  #  df_por_destino = _sentimiento_por_destino(df)
+  #  df_cruce       = _sentimiento_por_topico_destino(df)
 
-    df_por_topico.to_csv(Paths.SENTIMIENTO_POR_TOPICO_CSV, index=False, encoding='utf-8-sig')
-    df_por_destino.to_csv(Paths.SENTIMIENTO_POR_DESTINO_CSV, index=False, encoding='utf-8-sig')
-    df_cruce.to_csv(Paths.SENTIMIENTO_POR_TOPICO_DESTINO_CSV, index=False, encoding='utf-8-sig')
+  #  df_por_topico.to_csv(Paths.SENTIMIENTO_POR_TOPICO_CSV, index=False, encoding='utf-8-sig')
+  #  df_por_destino.to_csv(Paths.SENTIMIENTO_POR_DESTINO_CSV, index=False, encoding='utf-8-sig')
+  #  df_cruce.to_csv(Paths.SENTIMIENTO_POR_TOPICO_DESTINO_CSV, index=False, encoding='utf-8-sig')
 
     logger.info('=== Análisis de sentimiento completado. Archivos en: %s ===', output_dir)
 
@@ -367,9 +401,9 @@ def run_sentiment_analysis() -> dict[str, pd.DataFrame]:
         'corpus'             : df,
         'positivos'          : df_positivos,
         'negativos'          : df_negativos,
-        'por_topico'         : df_por_topico,
-        'por_destino'        : df_por_destino,
-        'por_topico_destino' : df_cruce,
+     #   'por_topico'         : df_por_topico,
+     #   'por_destino'        : df_por_destino,
+     #   'por_topico_destino' : df_cruce,
     }
 
 

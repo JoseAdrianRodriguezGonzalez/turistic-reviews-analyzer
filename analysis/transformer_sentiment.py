@@ -59,7 +59,7 @@ def _normalizar_etiqueta(label: str) -> str:
 def _cargar_pipeline_transformer(idioma: str, device: int | None = None):
     if device is None:
         device = _hf_device(resolve_device(Params.DEVICE))
-    nombre = MODELOS_SENTIMIENTO.get(idioma, MODELOS_SENTIMIENTO['es'])
+    nombre =MODELOS_SENTIMIENTO["multi"] if idioma=="fr" or idioma=="en" else MODELOS_SENTIMIENTO["es"] 
     logger.info('Cargando modelo de sentimiento: %s (device=%s)', nombre, 'cuda:0' if device == 0 else 'cpu')
     return hf_pipeline('text-classification', model=nombre, truncation=True, max_length=Params.SENTIMENT_MAX_LENGTH, device=device)
 

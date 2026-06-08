@@ -54,9 +54,9 @@ class StepPreprocessing(BaseStep):
 
         logger.info("[%s] Creando carpetas de datos por idioma", self.name)
         create_data_folders()
-
+        columna=Params.TEXT_COLUMN
         logger.info("[%s] Ejecutando pipeline de preprocesamiento", self.name)
-        results = process_pipeline(str(Paths.RAW_COMPLETE_CSV))
+        results = process_pipeline(str(Paths.RAW_COMPLETE_CSV),columna=columna)
         spanish,english,french,mixed=results
         logger.info(
             "[%s] Documentos procesados — es: %d | en: %d | fr: %d | mix: %d",

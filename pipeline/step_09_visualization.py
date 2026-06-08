@@ -56,14 +56,18 @@ class StepVisualization(BaseStep):
 
     @property
     def input_paths(self) -> list[Path]:
+        
+        from topic_enrichment.directory_get import get_active_enrichment_dir
+
+        active_dir = get_active_enrichment_dir()
         return [
             Paths.CLUSTERING_EMBEDDINGS_DIR / Paths.CLUSTERING_PROYECCION_FILE,
-            Paths.ENRICHMENT_KEYWORDS_CSV,
+             active_dir /"keywords_por_cluster.csv",
             #Paths.SENTIMIENTO_POR_DESTINO_CSV,
           #  Paths.SENTIMIENTO_POR_TOPICO_CSV,
           #  Paths.TENDENCIAS_TOPICOS_DESTINO_CSV,
           #  Paths.ENTIDADES_POR_DESTINO_CSV,
-            Paths.COOCURRENCIA_ENTIDADES_CSV,
+            #Paths.COOCURRENCIA_ENTIDADES_CSV,
          #   Paths.PERFIL_DESTINO_CSV,
         ]
 
@@ -85,6 +89,13 @@ class StepVisualization(BaseStep):
 
         for viz_name, modulo, funcion in _VISUALIZACIONES:
 
+            if viz_name == "cooccurrence":
+                if not Paths.COOCURRENCIA_ENTIDADES_CSV.exists():
+                    logger.warning(
+                        "[%s] Coocurrencia omitida (no existe input)",
+                        self.name
+                    )
+                    continue
             # Filtrar si se especificaron visualizaciones concretas
             if self.visualizaciones is not None:
                 if viz_name not in self.visualizaciones:
