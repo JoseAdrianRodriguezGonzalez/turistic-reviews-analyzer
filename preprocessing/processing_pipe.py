@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 
 def process_pipeline(
-    input_path: str,
+    input_path: str,language:str="all"
 ) -> tuple[list[tuple], list[tuple], list[tuple], list[tuple]]:
     """
     Ejecuta el pipeline completo de preprocesamiento sobre el corpus crudo.
@@ -77,12 +77,14 @@ def process_pipeline(
 
         try:
             comentario = row["text"]
-            estrellas  = row.get("stars", None)
+          #  estrellas  = row.get("stars", None)
 
             text = normalize_text(comentario)
             text = remove_light_noise(text)
-
-            lang = detect_language_type(text)
+            if language=="all":
+                lang = detect_language_type(text)
+            if language!="all":
+                lang=language
             nlp  = get_nlp_model(lang)
 
             # Si el idioma no tiene modelo, usar español como fallback
@@ -103,7 +105,6 @@ def process_pipeline(
 
             dict_analisis = {
                 "indice"        : idx,
-                "estrellas"     : estrellas,
                 "comentario"    : text,
                 "pos_tags"      : pos_tags,
                 "noun_phrases"  : noun_phrases,
@@ -115,7 +116,7 @@ def process_pipeline(
                 "indice"          : idx,
                 "comentario_clean": clean_text,
                 "lang"            : lang,
-                "location"        : row["location"],
+                "location"        : row.get("location",None),
             }
 
             if lang == "es":
@@ -144,5 +145,13 @@ def process_pipeline(
         len(french_results),
         len(mixed_results),
     )
-
+    if language != "all":
+        if language == "es":
+            return spanish_results, [], [], []
+        elif language == "en":
+            return [], english_results, [], []
+        elif language == "fr":
+            return [], [], french_results, []
+        elif language == "mixed":
+            return [], [], [], mixed_results
     return spanish_results, english_results, french_results, mixed_results

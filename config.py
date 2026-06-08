@@ -157,7 +157,7 @@ class Paths:
 # PARÁMETROS DEL PIPELINE
 
 ACCESSIBLE_PALETTES = {"viridis", "cividis", "plasma", "inferno", "sunset"}
-SUPPORTED_LANGUAGES = {"es", "en", "fr"}
+SUPPORTED_LANGUAGES = {"es", "en", "fr","all"}
 
 class Params:
     """
@@ -186,6 +186,7 @@ class Params:
     LANG_ENGLISH = "en"
     LANG_FRENCH  = "fr"
     LANG_MIXED   = "mixed"
+    LANG_ALL="all"
 
     # Dispositivo de cómputo: "auto" | "gpu" | "cpu"
     DEVICE: str = "gpu"
@@ -619,7 +620,8 @@ class Params:
         _logger.info("  Idioma      : %s", cls.LANGUAGE)
         _logger.info("  Título      : %s", cls.REPORT_TITLE)
         _logger.info("  Paleta      : %s", cls.COLOR_PALETTE)
-
+        if cls.LANGUAGE not in SUPPORTED_LANGUAGES:
+            raise ValueError(f"Idioma no válido: {cls.LANGUAGE}")
         # Advertir si la paleta no es una de las accesibles recomendadas
         if cls.COLOR_PALETTE not in ACCESSIBLE_PALETTES:
             _logger.warning(

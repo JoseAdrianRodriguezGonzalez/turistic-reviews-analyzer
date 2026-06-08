@@ -17,7 +17,7 @@ Output : data/data_spanish/clean.csv
 import logging
 from pathlib import Path
 
-from config import Paths
+from config import Params,Paths
 from pipeline.base_step import BaseStep
 
 logger = logging.getLogger(__name__)
@@ -33,16 +33,17 @@ class StepPreprocessing(BaseStep):
 
     @property
     def output_paths(self) -> list[Path]:
-        return [
-            Paths.SPANISH_CLEAN_CSV,
-            Paths.SPANISH_ANALYSIS_JSON,
-            Paths.ENGLISH_CLEAN_CSV,
-            Paths.ENGLISH_ANALYSIS_JSON,
-            Paths.FRENCH_CLEAN_CSV,
-            Paths.FRENCH_ANALYSIS_JSON,
-            Paths.MIXED_CLEAN_CSV,
-            Paths.MIXED_ANALYSIS_JSON,
-        ]
+        lang = Params.LANGUAGE
+        outputs = []
+        if lang in ("es", "all"):
+            outputs += [Paths.SPANISH_CLEAN_CSV, Paths.SPANISH_ANALYSIS_JSON]
+        if lang in ("en", "all"):
+            outputs += [Paths.ENGLISH_CLEAN_CSV, Paths.ENGLISH_ANALYSIS_JSON]
+        if lang in ("fr", "all"):
+            outputs += [Paths.FRENCH_CLEAN_CSV, Paths.FRENCH_ANALYSIS_JSON]
+        if lang in ("all"):
+            outputs += [Paths.MIXED_CLEAN_CSV, Paths.MIXED_ANALYSIS_JSON]
+        return outputs
 
     def _run(self) -> None:
         from preprocessing.individual_functions import (
@@ -55,16 +56,23 @@ class StepPreprocessing(BaseStep):
         create_data_folders()
 
         logger.info("[%s] Ejecutando pipeline de preprocesamiento", self.name)
-        spanish, english, french, mixed = process_pipeline(str(Paths.RAW_COMPLETE_CSV))
-
+        results = process_pipeline(str(Paths.RAW_COMPLETE_CSV))
+        spanish,english,french,mixed=results
         logger.info(
             "[%s] Documentos procesados — es: %d | en: %d | fr: %d | mix: %d",
             self.name, len(spanish), len(english), len(french), len(mixed),
         )
+        lang=Params.LANGUAGE
+        
+        if lang in ("es", "all"):
+            save_results(spanish, Paths.DATA_SPANISH_DIR)
 
-        save_results(spanish, Paths.DATA_SPANISH_DIR)
-        save_results(english, Paths.DATA_ENGLISH_DIR)
-        save_results(french,  Paths.DATA_FRENCH_DIR)
-        save_results(mixed,   Paths.DATA_MIXED_DIR)
+        if lang in ("en", "all"):
+            save_results(english, Paths.DATA_ENGLISH_DIR)
 
+        if lang in ("fr", "all"):
+            save_results(french, Paths.DATA_FRENCH_DIR)
+
+        if lang in ( "all"):
+            save_results(mixed, Paths.DATA_MIXED_DIR)
         logger.info("[%s] Resultados guardados por idioma", self.name)
