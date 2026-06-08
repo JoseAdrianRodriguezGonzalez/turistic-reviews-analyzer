@@ -92,6 +92,7 @@ class Paths:
     YAKE_PKL              = MODELS_DIR / "yake_vectorizer.pkl"
     # Resultados de BERTopic
     RESULTS_DIR           = DATA_DIR / "results"
+    ENRICHMENT_TEXTS = RESULTS_DIR /"text_enrich.csv"
     DOCS_WITH_TOPICS_CSV  = RESULTS_DIR / "docs_with_topics.csv"
     TOPICS_CSV            = RESULTS_DIR / "topics.csv"
     MICROTOPICS_CSV       = RESULTS_DIR / "microtopics.csv"

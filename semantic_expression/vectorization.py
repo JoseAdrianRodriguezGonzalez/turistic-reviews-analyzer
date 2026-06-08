@@ -37,7 +37,7 @@ def extract_yake(texts: list[str], top_k: int | None = None) -> list[list[str]]:
     if top_k is None:
         top_k = Params.YAKE_TOP_K
     kw_extractor = yake.KeywordExtractor(
-        lan=Params.YAKE_LANGUAGE,
+        lan=Params.LANGUAGE,
         n=Params.YAKE_NGRAM,
         top=top_k,
     )

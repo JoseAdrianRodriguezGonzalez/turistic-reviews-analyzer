@@ -37,12 +37,31 @@ class StepSemantic(BaseStep):
 
     @property
     def input_paths(self) -> list[Path]:
-        return [
-            Paths.NORMALIZED_SPANISH_CSV,
-            Paths.SPANISH_ANALYSIS_JSON,
-            Paths.ENGLISH_ANALYSIS_JSON,
-            Paths.MIXED_ANALYSIS_JSON,
-        ]
+        lang=Params.LANGUAGE
+        if lang=="all":
+            return [
+                Paths.NORMALIZED_SPANISH_CSV,
+                Paths.SPANISH_ANALYSIS_JSON,
+                Paths.ENGLISH_ANALYSIS_JSON,
+                Paths.MIXED_ANALYSIS_JSON,
+            ]
+        if lang=="es":
+            return [
+                Paths.SPANISH_CLEAN_CSV,
+                Paths.SPANISH_ANALYSIS_JSON,
+            ]
+        if lang == "en":
+            return [
+                Paths.ENGLISH_CLEAN_CSV,
+                Paths.ENGLISH_ANALYSIS_JSON,
+            ]
+
+        if lang == "fr":
+            return [
+                Paths.FRENCH_CLEAN_CSV,
+                Paths.FRENCH_ANALYSIS_JSON,
+            ]
+        return []
 
     @property
     def output_paths(self) -> list[Path]:
@@ -51,8 +70,10 @@ class StepSemantic(BaseStep):
             Paths.NER_GROUPS_JSON,
             Paths.TFIDF_PKL,
             Paths.YAKE_PKL,
-            Paths.DOCS_WITH_TOPICS_CSV,
-            Paths.TOPICS_CSV,
+            Paths.ENRICHMENT_TEXTS
+            #Paths.DOCS_WITH_TOPICS_CSV,
+            #Paths.TOPICS_CSV,
+
         ]
 
     def _run(self) -> None:
