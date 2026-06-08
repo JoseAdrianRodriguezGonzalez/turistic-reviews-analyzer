@@ -316,7 +316,7 @@ def _enriquecer_fuente(
 
 
 def run_enrichment_pipeline(
-    fuentes: list[str] | None = None,
+    active:str,fuentes: list[str] | None = None
 ) -> None:
     '''
     Pipeline completo de enriquecimiento de tópicos.

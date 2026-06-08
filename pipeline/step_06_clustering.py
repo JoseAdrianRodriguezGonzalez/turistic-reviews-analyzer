@@ -46,12 +46,24 @@ class StepClustering(BaseStep):
 
     @property
     def input_paths(self) -> list[Path]:
+        lang = Params.LANGUAGE
+        if lang == "all":
+            text_path = Paths.NORMALIZED_SPANISH_CSV
+        elif lang == "es":
+            text_path = Paths.SPANISH_CLEAN_CSV
+        elif lang == "en":
+            text_path = Paths.ENGLISH_CLEAN_CSV
+        elif lang == "fr":
+            text_path = Paths.FRENCH_CLEAN_CSV
+        else:
+            raise ValueError(f"Idioma no soportado: {lang}")
+
         return [
             Paths.DOCS_WITH_TOPICS_NPY,
             Paths.FEATURES_NLP_CSV,
             Paths.TFIDF_PKL,
             Paths.YAKE_PKL,
-            Paths.NORMALIZED_SPANISH_CSV,
+            text_path,
         ]
 
     @property
@@ -62,6 +74,7 @@ class StepClustering(BaseStep):
             Paths.CLUSTERING_EMBEDDINGS_DIR / Paths.CLUSTERING_MEJORES_FILE,
             Paths.CLUSTERING_EMBEDDINGS_DIR / Paths.CLUSTERING_ETIQUETAS_FILE,
             Paths.CLUSTERING_EMBEDDINGS_DIR / Paths.CLUSTERING_PROYECCION_FILE,
+            Paths.ENRICHMENT_DIR / "active_model.json"
         ]
 
     def _run(self) -> None:

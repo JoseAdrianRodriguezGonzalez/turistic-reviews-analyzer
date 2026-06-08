@@ -115,7 +115,7 @@ class Paths:
     ENRICHMENT_ACTIVE_DIR        = ENRICHMENT_DIR / "embeddings" / "kmeans_k9"
     # Modelo LLM local para topic naming (requiere llama_cpp)
     LLAMA_MODEL_PATH             = MODELS_DIR / "mistral-7b-instruct-v0.3-q4_k_m.gguf"
-    ENRICHMENT_KEYWORDS_CSV      = ENRICHMENT_ACTIVE_DIR / "keywords_por_cluster.csv"
+    #ENRICHMENT_KEYWORDS_CSV      = ENRICHMENT_ACTIVE_DIR / "keywords_por_cluster.csv"
     # Análisis
     ANALYSIS_DIR                 = DATA_DIR / "analysis"
     ANALYSIS_RESUMEN_CSV         = ANALYSIS_DIR / "resumen_analysis.csv"
